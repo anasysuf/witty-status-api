@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  witty-status-api:
+    build: .
+    container_name: witty-status-api
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - HOST=0.0.0.0
+      - NODE_ENV=production

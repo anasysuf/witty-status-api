@@ -1,0 +1,61 @@
+name: 💬 Propose New Witty Quote(s)
+description: Suggest funny and relatable developer quotes for an HTTP status code
+title: "quote: [Status Code] Short description"
+labels: ["quotes", "community"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing your humor and engineering creativity to WittyStatus API!
+  - type: dropdown
+    id: status_code
+    attributes:
+      label: HTTP Status Code
+      description: Select which status code this quote belongs to
+      options:
+        - "400 - Bad Request"
+        - "401 - Unauthorized"
+        - "403 - Forbidden"
+        - "404 - Not Found"
+        - "405 - Method Not Allowed"
+        - "408 - Request Timeout"
+        - "409 - Conflict"
+        - "418 - I'm a Teapot"
+        - "422 - Unprocessable Entity"
+        - "429 - Too Many Requests"
+        - "500 - Internal Server Error"
+        - "501 - Not Implemented"
+        - "502 - Bad Gateway"
+        - "503 - Service Unavailable"
+        - "504 - Gateway Timeout"
+        - "Other Status Code"
+    validations:
+      required: true
+  - type: input
+    id: headline
+    attributes:
+      label: Headline
+      description: Short, punchy summary of the situation (e.g., 'Cat walked across the numeric keypad')
+    validations:
+      required: true
+  - type: textarea
+    id: witty_message
+    attributes:
+      label: Witty Message
+      description: The main quote text. Keep it relatable, professional, and free of em dashes.
+    validations:
+      required: true
+  - type: textarea
+    id: action_advice
+    attributes:
+      label: Action Advice
+      description: Concrete recommendation for what the user or client should do next.
+    validations:
+      required: true
+  - type: input
+    id: technical_details
+    attributes:
+      label: Technical Details (Optional)
+      description: Realistic technical explanation of why this error happens.
+    validations:
+      required: false

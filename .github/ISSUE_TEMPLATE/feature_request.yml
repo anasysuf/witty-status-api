@@ -1,0 +1,30 @@
+name: ✨ Feature Request
+description: Suggest an enhancement, new endpoint, or framework integration example
+title: "feat: [Short description of proposal]"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea for a new feature or improvement? Let us know!
+  - type: textarea
+    id: feature_summary
+    attributes:
+      label: Proposed Feature / Enhancement
+      description: What feature or integration example would you like to see added?
+    validations:
+      required: true
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use Case / Motivation
+      description: Why is this feature useful to developers using WittyStatus API?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Additional Context or Alternatives Considered
+      description: Any code examples, sketches, or alternate approaches you have considered.
+    validations:
+      required: false

@@ -1,0 +1,70 @@
+{
+  "name": "witty-status-api",
+  "version": "1.0.0",
+  "description": "Witty and professional HTTP error and maintenance handling library and standalone API server with responsive HTML page renderers",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": "./dist/server.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "build:pages": "node --input-type=module -e \"import fs from 'fs'; import { STATUS_QUOTES, MAINTENANCE_DATA } from './dist/index.js'; if (!fs.existsSync('./docs')) fs.mkdirSync('./docs'); fs.writeFileSync('./docs/quotes-data.js', 'window.STATUS_DATA = ' + JSON.stringify({ quotes: STATUS_QUOTES, maintenance: MAINTENANCE_DATA }) + ';'); console.log('Successfully generated docs/quotes-data.js');\"",
+    "prepublishOnly": "npm run test && npm run build",
+    "start": "node dist/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "http-errors",
+    "maintenance",
+    "status-pages",
+    "error-handling",
+    "fastify",
+    "typescript",
+    "witty-messages",
+    "404",
+    "500",
+    "api"
+  ],
+  "author": "WittyStatus Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/witty-status-api/witty-status-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/witty-status-api/witty-status-api/issues"
+  },
+  "homepage": "https://witty-status-api.github.io/witty-status-api/",
+  "dependencies": {
+    "@fastify/cors": "^10.0.2",
+    "@fastify/rate-limit": "^10.2.2",
+    "@fastify/swagger": "^9.8.1",
+    "@fastify/swagger-ui": "^6.1.1",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.5",
+    "@types/supertest": "^6.0.2",
+    "supertest": "^7.0.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.7"
+  }
+}
