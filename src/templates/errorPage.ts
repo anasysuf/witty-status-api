@@ -1,14 +1,16 @@
-import { ErrorResponsePayload } from '../types/index.js';
+import { ErrorResponsePayload, BrandOptions } from '../types/index.js';
 
-export function renderErrorPage(payload: ErrorResponsePayload): string {
+export function renderErrorPage(payload: ErrorResponsePayload, brand?: BrandOptions): string {
   const jsonString = JSON.stringify(payload, null, 2);
+  const brandName = brand?.brandName || 'System Response';
+  const customPrimary = brand?.primaryColor ? `--primary: ${brand.primaryColor}; --badge-text: ${brand.primaryColor}; --focus-ring: ${brand.primaryColor};` : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${payload.status} ${payload.title} | Status</title>
+  <title>${payload.status} ${payload.title} | ${brandName}</title>
   <meta name="description" content="${payload.headline}">
   <style>
     :root {
@@ -25,6 +27,7 @@ export function renderErrorPage(payload: ErrorResponsePayload): string {
       --badge-bg: rgba(56, 189, 248, 0.12);
       --badge-text: #38bdf8;
       --focus-ring: #38bdf8;
+      ${customPrimary}
     }
 
     [data-theme="light"] {
@@ -267,7 +270,10 @@ export function renderErrorPage(payload: ErrorResponsePayload): string {
 <body>
   <div class="container">
     <div class="top-bar">
-      <span class="brand">System Response</span>
+      <div style="display:flex; align-items:center; gap:8px;">
+        ${brand?.logoUrl ? `<img src="${brand.logoUrl}" alt="${brandName} Logo" style="height:24px; width:auto; border-radius:4px;">` : ''}
+        <span class="brand">${brandName}</span>
+      </div>
       <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle theme">
         <span id="themeIcon" aria-hidden="true">&#9788;</span>
         <span id="themeLabel">Light Mode</span>
@@ -294,6 +300,8 @@ export function renderErrorPage(payload: ErrorResponsePayload): string {
         <button id="backBtn" class="btn btn-secondary" type="button" onclick="window.history.back()">
           Go Back
         </button>
+        ${brand?.supportUrl ? `<a class="btn btn-secondary" href="${brand.supportUrl}" target="_blank" rel="noopener noreferrer">Support Center</a>` : ''}
+        ${!brand?.supportUrl && brand?.supportEmail ? `<a class="btn btn-secondary" href="mailto:${brand.supportEmail}">Contact Support</a>` : ''}
       </div>
 
       <details>

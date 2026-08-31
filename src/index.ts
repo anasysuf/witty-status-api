@@ -23,6 +23,10 @@ export { renderErrorPage } from './templates/errorPage.js';
 export { renderMaintenancePage } from './templates/maintenancePage.js';
 export { renderPlaygroundPage } from './templates/playgroundPage.js';
 
+// Express & Fastify drop-in middlewares
+export { wittyErrorHandler, wittyNotFoundHandler, type WittyMiddlewareOptions } from './middleware/express.js';
+export { wittyFastifyPlugin, type WittyFastifyPluginOptions } from './middleware/fastify.js';
+
 // Fastify application builder
 export { buildApp } from './app.js';
 
@@ -31,5 +35,8 @@ export type {
   StatusQuote,
   ErrorResponsePayload,
   MaintenanceStatus,
-  HttpStatusCategory
+  HttpStatusCategory,
+  BrandOptions,
+  RFC7807ProblemDetails
 } from './types/index.js';
+

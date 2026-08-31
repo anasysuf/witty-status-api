@@ -666,9 +666,11 @@
         <section class="card">
           <div class="tab-bar">
             <button class="tab-btn active" data-tab="json" type="button">Response JSON</button>
+            <button class="tab-btn" data-tab="rfc7807" type="button">RFC 7807</button>
+            <button class="tab-btn" data-tab="express" type="button">Express Middleware</button>
+            <button class="tab-btn" data-tab="fastify" type="button">Fastify Plugin</button>
             <button class="tab-btn" data-tab="fetch" type="button">Fetch (JS)</button>
             <button class="tab-btn" data-tab="curl" type="button">cURL</button>
-            <button class="tab-btn" data-tab="express" type="button">Express</button>
             <button class="tab-btn" data-tab="nextjs" type="button">Next.js</button>
           </div>
 
@@ -1099,25 +1101,66 @@
 
         if (currentTab === 'json') {
           outputPre.textContent = JSON.stringify(payload, null, 2);
+        } else if (currentTab === 'rfc7807') {
+          const rfc = {
+            type: `https://httpstatuses.io/${codeNum}`,
+            title: payload.title || 'Error',
+            status: codeNum,
+            detail: payload.wittyMessage || payload.message,
+            instance: `/api/v1/resource`,
+            headline: payload.headline,
+            actionAdvice: payload.actionAdvice,
+            suggestedAction: payload.suggestedAction,
+            technicalDetails: payload.technicalDetails,
+            requestId: payload.requestId || 'trace_custom_999',
+            timestamp: payload.timestamp
+          };
+          outputPre.textContent = JSON.stringify(rfc, null, 2);
+        } else if (currentTab === 'express') {
+          outputPre.textContent =
+            `// Express.js 1-Line Drop-in Integration\n` +
+            `import express from 'express';\n` +
+            `import { wittyErrorHandler, wittyNotFoundHandler } from 'witty-status-api';\n\n` +
+            `const app = express();\n\n` +
+            `// ... application routes ...\n\n` +
+            `// 1-line 404 unrouted handler\n` +
+            `app.use(wittyNotFoundHandler({ format: 'auto' }));\n\n` +
+            `// 1-line central error handler (catches all exceptions & forwards X-Request-Id)\n` +
+            `app.use(wittyErrorHandler({\n` +
+            `  format: 'auto', // HTML for browsers, JSON / RFC 7807 for APIs\n` +
+            `  brand: {\n` +
+            `    brandName: 'MyCompany',\n` +
+            `    primaryColor: '#38bdf8',\n` +
+            `    supportUrl: 'https://help.mycompany.com'\n` +
+            `  }\n` +
+            `}));`;
+        } else if (currentTab === 'fastify') {
+          outputPre.textContent =
+            `// Fastify 1-Line Plugin Registration\n` +
+            `import Fastify from 'fastify';\n` +
+            `import { wittyFastifyPlugin } from 'witty-status-api';\n\n` +
+            `const app = Fastify({ logger: true });\n\n` +
+            `// Automatically sets up 404 handler and centralized error handling\n` +
+            `await app.register(wittyFastifyPlugin, {\n` +
+            `  format: 'auto',\n` +
+            `  brand: {\n` +
+            `    brandName: 'MyCompany',\n` +
+            `    primaryColor: '#38bdf8',\n` +
+            `    supportUrl: 'https://help.mycompany.com'\n` +
+            `  }\n` +
+            `});`;
         } else if (currentTab === 'fetch') {
           outputPre.textContent =
             `// Fetch error handling with WittyStatus API\n` +
-            `const response = await fetch("http://localhost:3001/api/v1/errors/${codeNum}");\n` +
-            `const errorPayload = await response.json();\n\n` +
-            `console.log(errorPayload.headline);\n` +
-            `console.log(errorPayload.wittyMessage);\n` +
-            `console.log("Suggested step:", errorPayload.actionAdvice);`;
+            `const response = await fetch("http://localhost:3001/api/v1/errors/${codeNum}?format=rfc7807", {\n` +
+            `  headers: { "X-Request-Id": "trace-uuid-12345" }\n` +
+            `});\n` +
+            `const problemDetails = await response.json();\n\n` +
+            `console.log(problemDetails.title, problemDetails.status);\n` +
+            `console.log(problemDetails.detail);\n` +
+            `console.log("Action advice:", problemDetails.actionAdvice);`;
         } else if (currentTab === 'curl') {
-          outputPre.textContent = `curl -s http://localhost:3001/api/v1/errors/${codeNum}`;
-        } else if (currentTab === 'express') {
-          outputPre.textContent =
-            `// Express Centralized Error Middleware\n` +
-            `app.use(async (err, req, res, next) => {\n` +
-            `  const statusCode = err.status || ${codeNum};\n` +
-            `  const response = await fetch(\`http://localhost:3001/api/v1/errors/\${statusCode}\`);\n` +
-            `  const payload = await response.json();\n` +
-            `  res.status(statusCode).json(payload);\n` +
-            `});`;
+          outputPre.textContent = `curl -s -H "X-Request-Id: trace-custom-999" "http://localhost:3001/api/v1/errors/${codeNum}?format=rfc7807"`;
         } else if (currentTab === 'nextjs') {
           outputPre.textContent =
             `// Next.js App Router (app/not-found.tsx)\n` +

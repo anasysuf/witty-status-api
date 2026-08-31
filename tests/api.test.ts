@@ -122,4 +122,44 @@ describe('WittyStatus API Suite', () => {
     expect(res.body.success).toBe(false);
     expect(res.body.status).toBe(404);
   });
+
+  it('GET /api/v1/errors/404?format=rfc7807 returns RFC 7807 Problem Details', async () => {
+    const res = await request(app.server).get('/api/v1/errors/404?format=rfc7807');
+    expect(res.status).toBe(404);
+    expect(res.headers['content-type']).toContain('application/problem+json');
+    expect(res.body.type).toBe('https://httpstatuses.io/404');
+    expect(res.body.title).toBe('Not Found');
+    expect(res.body.status).toBe(404);
+    expect(res.body.detail).toBeDefined();
+    expect(res.body.actionAdvice).toBeDefined();
+  });
+
+  it('GET /api/v1/errors/500 preserves X-Request-Id correlation ID', async () => {
+    const customTraceId = 'trace-enterprise-xyz-12345';
+    const res = await request(app.server)
+      .get('/api/v1/errors/500')
+      .set('x-request-id', customTraceId);
+    expect(res.status).toBe(500);
+    expect(res.body.requestId).toBe(customTraceId);
+  });
+
+  it('GET /api/v1/errors/404 with Accept: text/html triggers content negotiation', async () => {
+    const res = await request(app.server)
+      .get('/api/v1/errors/404')
+      .set('Accept', 'text/html');
+    expect(res.status).toBe(404);
+    expect(res.headers['content-type']).toContain('text/html');
+    expect(res.text).toContain('<!DOCTYPE html>');
+    expect(res.text).toContain('HTTP 404');
+  });
+
+  it('GET /render/error/404 supports white-label brand options', async () => {
+    const res = await request(app.server)
+      .get('/render/error/404?brand=AcmeCorp&color=%236366f1&support=https://help.acme.com');
+    expect(res.status).toBe(404);
+    expect(res.text).toContain('AcmeCorp');
+    expect(res.text).toContain('#6366f1');
+    expect(res.text).toContain('https://help.acme.com');
+  });
 });
+

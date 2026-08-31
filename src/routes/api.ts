@@ -1,9 +1,15 @@
 import { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { statusService } from '../services/statusService.js';
+import { renderErrorPage } from '../templates/errorPage.js';
 
 const ErrorCodeParamSchema = z.object({
   code: z.coerce.number().int().min(400).max(599)
+});
+
+const ErrorQuerySchema = z.object({
+  format: z.enum(['standard', 'rfc7807', 'html', 'json']).optional(),
+  brand: z.string().optional()
 });
 
 const RandomQuerySchema = z.object({
@@ -107,10 +113,18 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
           properties: {
             code: { type: 'integer' }
           }
+        },
+        querystring: {
+          type: 'object',
+          properties: {
+            format: { type: 'string', enum: ['standard', 'rfc7807', 'html', 'json'] },
+            brand: { type: 'string' }
+          }
         }
       }
     },
     async (request, reply) => {
+      const requestId = (request.headers['x-request-id'] as string) || request.id;
       const params = ErrorCodeParamSchema.safeParse(request.params);
       if (!params.success) {
         reply.status(400);
@@ -124,11 +138,32 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
           actionAdvice: 'Provide a supported status code such as 404 or 500.',
           suggestedAction: 'retry',
           timestamp: new Date().toISOString(),
-          requestId: `err_${Date.now()}`
+          requestId: requestId || `err_${Date.now()}`
         };
       }
 
-      const payload = statusService.buildErrorPayload(params.data.code);
+      const query = ErrorQuerySchema.parse(request.query);
+      const acceptHeader = (request.headers['accept'] as string) || '';
+      const wantsHtml =
+        query.format === 'html' ||
+        (query.format !== 'json' &&
+          query.format !== 'rfc7807' &&
+          acceptHeader.includes('text/html') &&
+          !acceptHeader.includes('application/json'));
+
+      if (wantsHtml) {
+        const payload = statusService.buildErrorPayload(params.data.code, undefined, requestId);
+        reply.status(payload.status).type('text/html; charset=utf-8');
+        return renderErrorPage(payload, query.brand ? { brandName: query.brand } : undefined);
+      }
+
+      if (query.format === 'rfc7807') {
+        const payload = statusService.buildRfc7807Payload(params.data.code, undefined, requestId, request.url);
+        reply.status(payload.status).type('application/problem+json');
+        return payload;
+      }
+
+      const payload = statusService.buildErrorPayload(params.data.code, undefined, requestId);
       reply.status(payload.status);
       return payload;
     }

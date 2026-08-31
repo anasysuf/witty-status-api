@@ -35,3 +35,26 @@ export interface ErrorResponsePayload {
   timestamp: string;
   requestId: string;
 }
+
+export interface BrandOptions {
+  brandName?: string;
+  logoUrl?: string;
+  primaryColor?: string;
+  supportUrl?: string;
+  supportEmail?: string;
+}
+
+export interface RFC7807ProblemDetails {
+  type: string;
+  title: string;
+  status: number;
+  detail: string;
+  instance?: string;
+  headline?: string;
+  actionAdvice: string;
+  suggestedAction: string;
+  technicalDetails: string;
+  requestId: string;
+  timestamp: string;
+}
+

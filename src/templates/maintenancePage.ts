@@ -1,12 +1,18 @@
-import { MaintenanceStatus } from '../types/index.js';
+import { MaintenanceStatus, BrandOptions } from '../types/index.js';
 
-export function renderMaintenancePage(data: MaintenanceStatus): string {
+export function renderMaintenancePage(data: MaintenanceStatus, brand?: BrandOptions): string {
+  const brandName = brand?.brandName || 'System Maintenance';
+  const customPrimary = brand?.primaryColor ? `--primary: ${brand.primaryColor}; --focus-ring: ${brand.primaryColor};` : '';
+  const supportEmail = brand?.supportEmail || data.supportEmail;
+  const supportUrl = brand?.supportUrl;
+  const pageTitle = brand?.brandName ? `${data.wittyHeadline} | ${brandName}` : 'System Maintenance in Progress';
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>System Maintenance in Progress</title>
+  <title>${pageTitle}</title>
   <meta name="description" content="${data.wittyHeadline}">
   <style>
     :root {
@@ -18,6 +24,8 @@ export function renderMaintenancePage(data: MaintenanceStatus): string {
       --primary: #38bdf8;
       --primary-hover: #0284c7;
       --primary-contrast: #0f172a;
+      ${customPrimary}
+    }
       --progress-bg: #334155;
       --focus-ring: #38bdf8;
     }
@@ -243,9 +251,12 @@ export function renderMaintenancePage(data: MaintenanceStatus): string {
 <body>
   <div class="container">
     <div class="top-bar">
-      <div class="status-indicator">
-        <span class="pulse-dot"></span>
-        <span>Maintenance Active</span>
+      <div style="display:flex; align-items:center; gap:12px;">
+        ${brand?.logoUrl ? `<img src="${brand.logoUrl}" alt="${brandName} Logo" style="height:24px; width:auto; border-radius:4px;">` : ''}
+        <div class="status-indicator">
+          <span class="pulse-dot"></span>
+          <span>${brandName} Maintenance</span>
+        </div>
       </div>
       <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle theme">
         <span id="themeIcon" aria-hidden="true">&#9788;</span>
@@ -282,9 +293,8 @@ export function renderMaintenancePage(data: MaintenanceStatus): string {
         <button class="btn btn-primary" type="button" onclick="window.location.reload()">
           Check Status Now
         </button>
-        <a class="btn btn-secondary" href="mailto:${data.supportEmail}">
-          Contact Support
-        </a>
+        ${supportUrl ? `<a class="btn btn-secondary" href="${supportUrl}" target="_blank" rel="noopener noreferrer">Support Center</a>` : ''}
+        ${!supportUrl && supportEmail ? `<a class="btn btn-secondary" href="mailto:${supportEmail}">Contact Support</a>` : ''}
       </div>
     </main>
 

@@ -190,26 +190,31 @@ You can redirect users or configure reverse proxies directly to these URLs:
 
 ## Multi-Stack Integration Examples
 
-### Express.js (Node.js)
+### Express.js (1-Line Drop-in Middleware)
 
-```javascript
+```typescript
 import express from 'express';
+import { wittyErrorHandler, wittyNotFoundHandler } from 'witty-status-api';
 
 const app = express();
 
-// Handle unhandled routes (404)
-app.use(async (req, res) => {
-  const response = await fetch('http://localhost:3001/api/v1/errors/404');
-  const payload = await response.json();
-  res.status(404).json(payload);
-});
+// ... application routes ...
 
-// Centralized error handler (500)
-app.use(async (err, req, res, next) => {
-  const response = await fetch('http://localhost:3001/api/v1/errors/500');
-  const payload = await response.json();
-  res.status(500).json(payload);
-});
+// Catch unrouted requests (404)
+app.use(wittyNotFoundHandler({
+  format: 'auto', // HTML for browser requests, JSON / RFC 7807 for API callers
+  brand: { brandName: 'Acme Corp', primaryColor: '#38bdf8' }
+}));
+
+// Centralized error handler (catches exceptions, forwards X-Request-Id, renders witty copy)
+app.use(wittyErrorHandler({
+  format: 'auto',
+  brand: {
+    brandName: 'Acme Corp',
+    primaryColor: '#38bdf8',
+    supportUrl: 'https://help.acme.com'
+  }
+}));
 ```
 
 ### Next.js App Router (`app/not-found.tsx`)
@@ -234,18 +239,22 @@ export default async function NotFound() {
 }
 ```
 
-### Fastify
+### Fastify (1-Line Plugin Registration)
 
 ```typescript
 import Fastify from 'fastify';
+import { wittyFastifyPlugin } from 'witty-status-api';
 
-const fastify = Fastify();
+const fastify = Fastify({ logger: true });
 
-fastify.setErrorHandler(async (error, request, reply) => {
-  const statusCode = error.statusCode || 500;
-  const res = await fetch(`http://localhost:3001/api/v1/errors/${statusCode}`);
-  const payload = await res.json();
-  reply.status(statusCode).send(payload);
+// Registers automatic 404 handling and centralized witty error formatter
+await fastify.register(wittyFastifyPlugin, {
+  format: 'auto', // Content negotiation: HTML for browsers, JSON/RFC 7807 for APIs
+  brand: {
+    brandName: 'Acme Corp',
+    primaryColor: '#38bdf8',
+    supportUrl: 'https://help.acme.com'
+  }
 });
 ```
 
@@ -301,6 +310,67 @@ server {
     }
 }
 ```
+
+---
+
+## Enterprise & Production Features
+
+### 1. RFC 7807 / RFC 9457 Problem Details Support
+
+Append `?format=rfc7807` to any error endpoint or specify `{ format: 'rfc7807' }` in middleware options:
+
+```bash
+curl -s http://localhost:3001/api/v1/errors/404?format=rfc7807
+```
+
+```json
+{
+  "type": "https://httpstatuses.io/404",
+  "title": "Not Found",
+  "status": 404,
+  "detail": "We searched every digital nook and database cranny. This page appears to have vanished into thin air.",
+  "instance": "/api/v1/resource",
+  "headline": "This page went on an existential walk",
+  "actionAdvice": "Verify your path segments or return to the base application url.",
+  "suggestedAction": "back",
+  "technicalDetails": "Target route is missing from active Fastify route tables.",
+  "requestId": "trace_custom_999",
+  "timestamp": "2026-08-31T12:00:00.000Z"
+}
+```
+
+### 2. Distributed Tracing & Correlation ID (`X-Request-Id`)
+
+Pass your microservice trace ID via the `X-Request-Id` header. WittyStatus API preserves and exposes it in JSON payloads and the embedded HTML payload inspector for seamless Sentry/Datadog triage:
+
+```bash
+curl -s -H "X-Request-Id: trace-datadog-uuid-8899" http://localhost:3001/api/v1/errors/500
+```
+
+### 3. White-Label Branding Customization
+
+Customize HTML error and maintenance pages with your organization's visual identity:
+
+```bash
+# Query params on standalone server
+http://localhost:3001/render/error/404?brand=AcmeCorp&color=%236366f1&support=https://help.acme.com
+```
+
+```typescript
+// Via TypeScript library import
+renderErrorPage(payload, {
+  brandName: 'Acme Corp',
+  primaryColor: '#6366f1',
+  logoUrl: 'https://acme.com/logo.svg',
+  supportUrl: 'https://help.acme.com'
+});
+```
+
+### 4. Smart Content Negotiation
+
+The error endpoint automatically inspects the `Accept` header:
+- `Accept: text/html` (Browser visits) -> Returns pre-rendered responsive HTML view.
+- `Accept: application/json` (API clients / fetch / cURL) -> Returns structured JSON response.
 
 ---
 

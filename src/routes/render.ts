@@ -20,18 +20,31 @@ export const renderRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/render/error/:code', async (request, reply) => {
     const params = ErrorCodeParamSchema.safeParse(request.params);
     const code = params.success ? params.data.code : 404;
+    const requestId = (request.headers['x-request-id'] as string) || request.id;
+    const query = request.query as { brand?: string; color?: string; logo?: string; support?: string };
 
-    const payload = statusService.buildErrorPayload(code);
+    const payload = statusService.buildErrorPayload(code, undefined, requestId);
     reply.status(payload.status);
     reply.type('text/html; charset=utf-8');
-    return renderErrorPage(payload);
+    return renderErrorPage(payload, {
+      brandName: query.brand,
+      primaryColor: query.color,
+      logoUrl: query.logo,
+      supportUrl: query.support
+    });
   });
 
   // Render standalone HTML maintenance page
   fastify.get('/render/maintenance', async (request, reply) => {
     const data = statusService.getMaintenanceData();
+    const query = request.query as { brand?: string; color?: string; logo?: string; support?: string };
     reply.status(503);
     reply.type('text/html; charset=utf-8');
-    return renderMaintenancePage(data);
+    return renderMaintenancePage(data, {
+      brandName: query.brand,
+      primaryColor: query.color,
+      logoUrl: query.logo,
+      supportUrl: query.support
+    });
   });
 };

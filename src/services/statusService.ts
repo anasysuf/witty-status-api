@@ -1,5 +1,5 @@
 import { STATUS_QUOTES, MAINTENANCE_DATA } from '../data/quotes.js';
-import { StatusQuote, ErrorResponsePayload, MaintenanceStatus } from '../types/index.js';
+import { StatusQuote, ErrorResponsePayload, MaintenanceStatus, RFC7807ProblemDetails } from '../types/index.js';
 
 export class StatusService {
   getAllQuotes(): StatusQuote[] {
@@ -48,9 +48,9 @@ export class StatusService {
     return pool[randomIndex];
   }
 
-  buildErrorPayload(code: number, customMessage?: string): ErrorResponsePayload {
+  buildErrorPayload(code: number, customMessage?: string, customRequestId?: string): ErrorResponsePayload {
     const quotes = this.getQuotesByCode(code);
-    const id = `req_${Math.random().toString(36).substring(2, 9)}`;
+    const id = customRequestId || `req_${Math.random().toString(36).substring(2, 9)}`;
 
     if (quotes.length > 0) {
       const quote = quotes[Math.floor(Math.random() * quotes.length)];
@@ -85,6 +85,28 @@ export class StatusService {
       suggestedAction: 'retry',
       timestamp: new Date().toISOString(),
       requestId: id
+    };
+  }
+
+  buildRfc7807Payload(
+    code: number,
+    customMessage?: string,
+    customRequestId?: string,
+    instanceUri?: string
+  ): RFC7807ProblemDetails {
+    const std = this.buildErrorPayload(code, customMessage, customRequestId);
+    return {
+      type: `https://httpstatuses.io/${code}`,
+      title: std.title,
+      status: std.status,
+      detail: std.wittyMessage,
+      instance: instanceUri,
+      headline: std.headline,
+      actionAdvice: std.actionAdvice,
+      suggestedAction: std.suggestedAction,
+      technicalDetails: std.technicalDetails,
+      requestId: std.requestId,
+      timestamp: std.timestamp
     };
   }
 
