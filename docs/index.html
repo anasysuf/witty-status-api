@@ -701,7 +701,7 @@
     <p>${m.message}</p>
     <div class="progress-bar"><div class="fill"></div></div>
     <p style="font-size:0.85rem">Current Task: ${m.currentActivity} (${m.progressPercent}%)</p>
-    <button class="btn" onclick="alert('Simulation: Checked status!')">Check Status</button>
+    <button class="btn" onclick="window.parent.checkStatus ? window.parent.checkStatus() : window.location.reload()">Check Status</button>
   </div>
 </body>
 </html>`;
@@ -734,8 +734,8 @@
       <p style="margin-top:4px"><strong>Action:</strong> ${payload.actionAdvice}</p>
     </div>
     <div>
-      <button class="btn" onclick="alert('Simulation: Try Again!')">Try Again</button>
-      <button class="btn-sec" onclick="alert('Simulation: Back action!')">Go Back</button>
+      <button class="btn" onclick="window.parent.shuffleQuote ? window.parent.shuffleQuote() : window.location.reload()">Try Again</button>
+      <button class="btn-sec" onclick="window.parent.previousQuote ? window.parent.previousQuote() : window.history.back()">Go Back</button>
     </div>
   </div>
 </body>
@@ -749,7 +749,7 @@
       }
 
       // Shuffle quote
-      shuffleBtn.addEventListener('click', () => {
+      function shuffleQuote() {
         const quotes = getQuotesForCurrentCode();
         if (quotes.length > 1) {
           let nextIndex;
@@ -759,7 +759,30 @@
           currentQuoteIndex = nextIndex;
         }
         renderAll();
-      });
+      }
+
+      function previousQuote() {
+        const quotes = getQuotesForCurrentCode();
+        if (quotes.length > 1) {
+          currentQuoteIndex = (currentQuoteIndex - 1 + quotes.length) % quotes.length;
+          renderAll();
+        }
+      }
+
+      function checkStatus() {
+        if (currentCode === 'maintenance' && window.STATUS_DATA && window.STATUS_DATA.maintenance) {
+          const m = window.STATUS_DATA.maintenance;
+          m.progressPercent = Math.min(99, m.progressPercent + Math.floor(Math.random() * 4) + 1);
+        }
+        renderAll();
+      }
+
+      // Expose to window for iframe click triggers
+      window.shuffleQuote = shuffleQuote;
+      window.previousQuote = previousQuote;
+      window.checkStatus = checkStatus;
+
+      shuffleBtn.addEventListener('click', shuffleQuote);
 
       // Tabs click
       document.querySelectorAll('.tab-btn').forEach(btn => {
