@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WittyStatus API: Interactive Playground & Live Demo</title>
+  <meta name="description" content="Explore and test witty, relatable, and professional HTTP error and downtime status handling library and API.">
+  <style>
+    :root {
+      --bg: #0b1120;
+      --surface: #1e293b;
+      --surface-hover: #334155;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --primary-contrast: #0b1120;
+      --code-bg: #020617;
+      --badge-bg: rgba(56, 189, 248, 0.12);
+      --badge-text: #38bdf8;
+      --focus-ring: #38bdf8;
+      --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-hover: #f1f5f9;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --primary-contrast: #ffffff;
+      --code-bg: #f1f5f9;
+      --badge-bg: rgba(2, 132, 199, 0.12);
+      --badge-text: #0284c7;
+      --focus-ring: #0284c7;
+      --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 32px 16px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      min-height: 100vh;
+    }
+
+    .wrapper {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 28px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand-title {
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .brand-tag {
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      padding: 4px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-subtitle {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-top: 6px;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      min-height: 42px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      transition: all 0.15s ease;
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .btn:hover {
+      background: var(--surface-hover);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--primary-contrast);
+      border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+    }
+
+    .btn:focus-visible, select:focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+
+    /* Grid Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    @media (max-width: 860px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Code Pills */
+    .pills-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .pill {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pill:hover {
+      color: var(--text);
+      border-color: var(--primary);
+    }
+
+    .pill.active {
+      background: var(--primary);
+      color: var(--primary-contrast);
+      border-color: var(--primary);
+    }
+
+    /* Selector Controls */
+    .controls-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .select-control {
+      flex: 1;
+      height: 42px;
+      padding: 0 14px;
+      border-radius: 6px;
+      background: var(--code-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      font-size: 0.925rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Quote Spotlight Card */
+    .spotlight {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      flex: 1;
+    }
+
+    .spotlight-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .spotlight-headline {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .spotlight-quote {
+      font-size: 0.95rem;
+      font-style: italic;
+      color: var(--text);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .spotlight-details {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .spotlight-details strong {
+      color: var(--text);
+    }
+
+    .counter-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: right;
+      margin-top: -12px;
+      margin-bottom: 14px;
+    }
+
+    /* Tabs */
+    .tab-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      font-size: 0.825rem;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      background: var(--surface-hover);
+      color: var(--primary);
+    }
+
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.825rem;
+      color: var(--text);
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      flex: 1;
+      max-height: 380px;
+    }
+
+    .code-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    /* Live Preview Modal / Container */
+    .preview-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .preview-frame-container {
+      width: 100%;
+      height: 480px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #000;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: var(--bg);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      padding: 20px 0;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      <div>
+        <h1 class="brand-title">
+          WittyStatus API
+          <span class="brand-tag">394 Quotes Catalog</span>
+        </h1>
+        <p class="brand-subtitle">Interactive developer playground and client-side live demo</p>
+      </div>
+
+      <div class="nav-actions">
+        <button id="themeToggle" class="btn" type="button" aria-label="Toggle theme">
+          <span id="themeIcon" aria-hidden="true">&#9788;</span>
+          <span id="themeLabel">Light Mode</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="pills-container" id="pillsContainer">
+      <!-- Status code badges rendered by script -->
+    </div>
+
+    <div class="dashboard-grid">
+      <!-- Left Card: Status Selector & Live Quote Spotlight -->
+      <section class="card">
+        <h2 class="card-title">
+          <span>Quote Spotlight</span>
+          <button id="shuffleBtn" class="btn btn-primary" type="button">
+            <span>&#x21bb; Shuffle Quote</span>
+          </button>
+        </h2>
+
+        <div class="controls-row">
+          <select id="codeSelect" class="select-control" aria-label="Select HTTP status code">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div class="counter-text" id="counterText">Quote 1 of 30</div>
+
+        <div class="spotlight" id="spotlightBox">
+          <span class="spotlight-badge" id="spotlightBadge">HTTP 404 &bull; Not Found</span>
+          <h3 class="spotlight-headline" id="spotlightHeadline">This page went on an existential walk</h3>
+          <p class="spotlight-quote" id="spotlightQuote">"We searched every digital nook and database cranny..."</p>
+          <div class="spotlight-details">
+            <div><strong>Technical:</strong> <span id="spotlightTech">Target route missing.</span></div>
+            <div><strong>Suggested Step:</strong> <span id="spotlightAdvice">Check URL or return home.</span></div>
+            <div><strong>Action Type:</strong> <span id="spotlightAction">back</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Card: JSON Response & Code Snippets -->
+      <section class="card">
+        <div class="tab-bar">
+          <button class="tab-btn active" data-tab="json" type="button">Response JSON</button>
+          <button class="tab-btn" data-tab="fetch" type="button">Fetch (JS)</button>
+          <button class="tab-btn" data-tab="curl" type="button">cURL</button>
+          <button class="tab-btn" data-tab="express" type="button">Express</button>
+          <button class="tab-btn" data-tab="nextjs" type="button">Next.js</button>
+        </div>
+
+        <pre id="outputPre">Loading...</pre>
+
+        <div class="code-actions">
+          <button id="copyBtn" class="btn" type="button">Copy to Clipboard</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Live Rendered HTML View Section -->
+    <section class="preview-section">
+      <div class="preview-header">
+        <div>
+          <h2 style="font-size: 1.2rem; font-weight: 700;">Live Rendered Page Preview</h2>
+          <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 2px;">
+            Accessible standalone HTML view rendered completely client-side in an isolated sandbox.
+          </p>
+        </div>
+        <button id="refreshPreviewBtn" class="btn" type="button">Reload Preview</button>
+      </div>
+
+      <div class="preview-frame-container">
+        <iframe id="previewFrame" title="Error Page Live Preview"></iframe>
+      </div>
+    </section>
+
+    <footer>
+      WittyStatus API &bull; Released under the MIT License &bull; Runs 100% locally and on GitHub Pages
+    </footer>
+  </div>
+
+  <script src="./quotes-data.js"></script>
+  <script>
+    (function () {
+      const CODES = [400, 401, 403, 404, 405, 408, 409, 422, 429, 500, 502, 503, 504, 418, 501, 'maintenance'];
+      let currentCode = 404;
+      let currentQuoteIndex = 0;
+      let currentTab = 'json';
+
+      const pillsContainer = document.getElementById('pillsContainer');
+      const codeSelect = document.getElementById('codeSelect');
+      const shuffleBtn = document.getElementById('shuffleBtn');
+      const counterText = document.getElementById('counterText');
+      const outputPre = document.getElementById('outputPre');
+      const copyBtn = document.getElementById('copyBtn');
+      const previewFrame = document.getElementById('previewFrame');
+      const refreshPreviewBtn = document.getElementById('refreshPreviewBtn');
+      const themeToggle = document.getElementById('themeToggle');
+      const themeIcon = document.getElementById('themeIcon');
+      const themeLabel = document.getElementById('themeLabel');
+
+      // Theme toggle
+      function updateTheme(theme) {
+        if (theme === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+          themeIcon.textContent = '\u263D';
+          themeLabel.textContent = 'Dark Mode';
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+          themeIcon.textContent = '\u2600';
+          themeLabel.textContent = 'Light Mode';
+        }
+        localStorage.setItem('theme', theme);
+        renderIframe();
+      }
+
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        updateTheme(savedTheme);
+      }
+
+      themeToggle.addEventListener('click', function () {
+        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+        updateTheme(isLight ? 'dark' : 'light');
+      });
+
+      // Populate Pills & Select
+      CODES.forEach(code => {
+        const pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'pill' + (code === 404 ? ' active' : '');
+        pill.textContent = code === 'maintenance' ? '503 Maintenance' : code;
+        pill.addEventListener('click', () => setCode(code));
+        pillsContainer.appendChild(pill);
+
+        const opt = document.createElement('option');
+        opt.value = code;
+        opt.textContent = code === 'maintenance' ? 'Maintenance (503 Service Unavailable)' : `HTTP ${code}`;
+        if (code === 404) opt.selected = true;
+        codeSelect.appendChild(opt);
+      });
+
+      codeSelect.addEventListener('change', (e) => {
+        const val = e.target.value === 'maintenance' ? 'maintenance' : Number(e.target.value);
+        setCode(val);
+      });
+
+      function setCode(code) {
+        currentCode = code;
+        currentQuoteIndex = 0;
+        codeSelect.value = code;
+
+        // Update pills active class
+        Array.from(pillsContainer.children).forEach(pill => {
+          const pillCode = pill.textContent.includes('Maintenance') ? 'maintenance' : Number(pill.textContent);
+          pill.classList.toggle('active', pillCode === code);
+        });
+
+        renderAll();
+      }
+
+      function getQuotesForCurrentCode() {
+        if (!window.STATUS_DATA || !window.STATUS_DATA.quotes) return [];
+        if (currentCode === 'maintenance') return [];
+        return window.STATUS_DATA.quotes.filter(q => q.code === currentCode);
+      }
+
+      function getCurrentQuote() {
+        const list = getQuotesForCurrentCode();
+        if (list.length === 0) return null;
+        return list[currentQuoteIndex % list.length];
+      }
+
+      function getPayload() {
+        if (currentCode === 'maintenance') {
+          const m = window.STATUS_DATA.maintenance;
+          return {
+            success: false,
+            status: 503,
+            title: 'Service Unavailable',
+            headline: m.wittyHeadline,
+            message: m.message,
+            currentActivity: m.currentActivity,
+            progressPercent: m.progressPercent,
+            estimatedDuration: m.estimatedDuration,
+            estimatedCompletion: 'In approximately 15 minutes',
+            supportEmail: m.supportEmail,
+            timestamp: new Date().toISOString()
+          };
+        }
+
+        const quote = getCurrentQuote();
+        if (!quote) return {};
+
+        return {
+          success: false,
+          status: quote.code,
+          title: quote.title,
+          headline: quote.headline,
+          wittyMessage: quote.wittyMessage,
+          technicalDetails: quote.technicalDetails,
+          actionAdvice: quote.actionAdvice,
+          suggestedAction: quote.suggestedAction,
+          timestamp: new Date().toISOString(),
+          requestId: 'req_' + Math.random().toString(36).substring(2, 9)
+        };
+      }
+
+      function renderAll() {
+        const quotes = getQuotesForCurrentCode();
+        const quote = getCurrentQuote();
+
+        if (currentCode === 'maintenance') {
+          const m = window.STATUS_DATA.maintenance;
+          counterText.textContent = 'Dedicated Maintenance Status';
+          document.getElementById('spotlightBadge').textContent = 'HTTP 503 \u2022 Scheduled Maintenance';
+          document.getElementById('spotlightHeadline').textContent = m.wittyHeadline;
+          document.getElementById('spotlightQuote').textContent = `"${m.message}"`;
+          document.getElementById('spotlightTech').textContent = m.currentActivity;
+          document.getElementById('spotlightAdvice').textContent = 'Check back shortly or monitor service status.';
+          document.getElementById('spotlightAction').textContent = 'wait';
+        } else if (quote) {
+          counterText.textContent = `Quote ${currentQuoteIndex + 1} of ${quotes.length}`;
+          document.getElementById('spotlightBadge').textContent = `HTTP ${quote.code} \u2022 ${quote.title}`;
+          document.getElementById('spotlightHeadline').textContent = quote.headline;
+          document.getElementById('spotlightQuote').textContent = `"${quote.wittyMessage}"`;
+          document.getElementById('spotlightTech').textContent = quote.technicalDetails;
+          document.getElementById('spotlightAdvice').textContent = quote.actionAdvice;
+          document.getElementById('spotlightAction').textContent = quote.suggestedAction;
+        }
+
+        renderOutput();
+        renderIframe();
+      }
+
+      function renderOutput() {
+        const payload = getPayload();
+        const codeNum = currentCode === 'maintenance' ? 503 : currentCode;
+
+        if (currentTab === 'json') {
+          outputPre.textContent = JSON.stringify(payload, null, 2);
+        } else if (currentTab === 'fetch') {
+          outputPre.textContent =
+            `// Fetch error handling with WittyStatus API\n` +
+            `const response = await fetch("http://localhost:3001/api/v1/errors/${codeNum}");\n` +
+            `const errorPayload = await response.json();\n\n` +
+            `console.log(errorPayload.headline);\n` +
+            `console.log(errorPayload.wittyMessage);\n` +
+            `console.log("Suggested step:", errorPayload.actionAdvice);`;
+        } else if (currentTab === 'curl') {
+          outputPre.textContent = `curl -s http://localhost:3001/api/v1/errors/${codeNum}`;
+        } else if (currentTab === 'express') {
+          outputPre.textContent =
+            `// Express Centralized Error Middleware\n` +
+            `app.use(async (err, req, res, next) => {\n` +
+            `  const statusCode = err.status || ${codeNum};\n` +
+            `  const response = await fetch(\`http://localhost:3001/api/v1/errors/\${statusCode}\`);\n` +
+            `  const payload = await response.json();\n` +
+            `  res.status(statusCode).json(payload);\n` +
+            `});`;
+        } else if (currentTab === 'nextjs') {
+          outputPre.textContent =
+            `// Next.js App Router (app/not-found.tsx)\n` +
+            `import Link from 'next/link';\n\n` +
+            `export default async function NotFound() {\n` +
+            `  const res = await fetch('http://localhost:3001/api/v1/errors/404', { cache: 'no-store' });\n` +
+            `  const error = await res.json();\n\n` +
+            `  return (\n` +
+            `    <main style={{ padding: '40px 20px', textAlign: 'center' }}>\n` +
+            `      <h1>{error.headline}</h1>\n` +
+            `      <p>"{error.wittyMessage}"</p>\n` +
+            `      <p><strong>Next Step:</strong> {error.actionAdvice}</p>\n` +
+            `      <Link href="/">Back to Home</Link>\n` +
+            `    </main>\n` +
+            `  );\n` +
+            `}`;
+        }
+      }
+
+      function renderIframe() {
+        const payload = getPayload();
+        const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+
+        let html = '';
+        if (currentCode === 'maintenance') {
+          const m = window.STATUS_DATA.maintenance;
+          html = `<!DOCTYPE html>
+<html lang="en" data-theme="${theme}">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    :root { --bg: #0f172a; --card-bg: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8; --primary: #38bdf8; }
+    [data-theme="light"] { --bg: #f8fafc; --card-bg: #ffffff; --border: #e2e8f0; --text: #0f172a; --muted: #475569; --primary: #0284c7; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: var(--bg); color: var(--text); padding: 24px 16px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 28px; max-width: 540px; width: 100%; text-align: center; }
+    h1 { font-size: 1.5rem; margin-bottom: 12px; }
+    p { color: var(--muted); margin-bottom: 16px; font-size: 0.95rem; }
+    .progress-bar { background: var(--border); height: 10px; border-radius: 999px; overflow: hidden; margin-bottom: 20px; }
+    .fill { width: ${m.progressPercent}%; height: 100%; background: var(--primary); }
+    .btn { background: var(--primary); color: #000; padding: 10px 20px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>${m.wittyHeadline}</h1>
+    <p>${m.message}</p>
+    <div class="progress-bar"><div class="fill"></div></div>
+    <p style="font-size:0.85rem">Current Task: ${m.currentActivity} (${m.progressPercent}%)</p>
+    <button class="btn" onclick="alert('Simulation: Checked status!')">Check Status</button>
+  </div>
+</body>
+</html>`;
+        } else {
+          html = `<!DOCTYPE html>
+<html lang="en" data-theme="${theme}">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    :root { --bg: #0f172a; --card-bg: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8; --primary: #38bdf8; --code: #0b1120; }
+    [data-theme="light"] { --bg: #f8fafc; --card-bg: #ffffff; --border: #e2e8f0; --text: #0f172a; --muted: #475569; --primary: #0284c7; --code: #f1f5f9; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: var(--bg); color: var(--text); padding: 24px 16px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 28px; max-width: 540px; width: 100%; }
+    .badge { display: inline-block; background: rgba(56,189,248,0.15); color: var(--primary); padding: 4px 10px; border-radius: 4px; font-weight: 700; font-size: 0.85rem; margin-bottom: 12px; }
+    h1 { font-size: 1.4rem; margin-bottom: 12px; }
+    .quote { background: var(--code); border-left: 4px solid var(--primary); padding: 14px; border-radius: 4px; font-style: italic; margin-bottom: 16px; font-size: 0.95rem; }
+    .advice { font-size: 0.85rem; color: var(--muted); margin-bottom: 18px; }
+    .btn { background: var(--primary); color: #000; padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; margin-right: 8px; }
+    .btn-sec { background: transparent; color: var(--text); border: 1px solid var(--border); padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">HTTP ${payload.status} : ${payload.title}</div>
+    <h1>${payload.headline}</h1>
+    <div class="quote">"${payload.wittyMessage}"</div>
+    <div class="advice">
+      <p><strong>Occurred:</strong> ${payload.technicalDetails}</p>
+      <p style="margin-top:4px"><strong>Action:</strong> ${payload.actionAdvice}</p>
+    </div>
+    <div>
+      <button class="btn" onclick="alert('Simulation: Try Again!')">Try Again</button>
+      <button class="btn-sec" onclick="alert('Simulation: Back action!')">Go Back</button>
+    </div>
+  </div>
+</body>
+</html>`;
+        }
+
+        const doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+        doc.open();
+        doc.write(html);
+        doc.close();
+      }
+
+      // Shuffle quote
+      shuffleBtn.addEventListener('click', () => {
+        const quotes = getQuotesForCurrentCode();
+        if (quotes.length > 1) {
+          let nextIndex;
+          do {
+            nextIndex = Math.floor(Math.random() * quotes.length);
+          } while (nextIndex === currentQuoteIndex);
+          currentQuoteIndex = nextIndex;
+        }
+        renderAll();
+      });
+
+      // Tabs click
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentTab = btn.getAttribute('data-tab');
+          renderOutput();
+        });
+      });
+
+      // Copy output
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(outputPre.textContent).then(() => {
+          const original = copyBtn.textContent;
+          copyBtn.textContent = 'Copied!';
+          copyBtn.style.color = '#38bdf8';
+          setTimeout(() => {
+            copyBtn.textContent = original;
+            copyBtn.style.color = '';
+          }, 1800);
+        });
+      });
+
+      refreshPreviewBtn.addEventListener('click', renderIframe);
+
+      // Initial execution
+      setCode(404);
+    })();
+  </script>
+</body>
+</html>

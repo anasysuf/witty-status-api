@@ -22,7 +22,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "build:pages": "node --input-type=module -e \"import fs from 'fs'; import { STATUS_QUOTES, MAINTENANCE_DATA } from './dist/index.js'; if (!fs.existsSync('./docs')) fs.mkdirSync('./docs'); fs.writeFileSync('./docs/quotes-data.js', 'window.STATUS_DATA = ' + JSON.stringify({ quotes: STATUS_QUOTES, maintenance: MAINTENANCE_DATA }) + ';'); console.log('Successfully generated docs/quotes-data.js');\"",
+    "build:pages": "node --input-type=module -e \"import fs from 'fs'; import { STATUS_QUOTES, MAINTENANCE_DATA } from './dist/index.js'; const data = 'window.STATUS_DATA = ' + JSON.stringify({ quotes: STATUS_QUOTES, maintenance: MAINTENANCE_DATA }) + ';'; fs.writeFileSync('./quotes-data.js', data); if (!fs.existsSync('./docs')) fs.mkdirSync('./docs'); fs.writeFileSync('./docs/quotes-data.js', data); console.log('Successfully generated quotes-data.js in root and docs/');\"",
     "prepublishOnly": "npm run test && npm run build",
     "start": "node dist/server.js",
     "test": "vitest run",

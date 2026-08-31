@@ -5,7 +5,7 @@
 [![Fastify](https://img.shields.io/badge/Fastify-5.2-black?logo=fastify)](https://fastify.dev/)
 [![Tests](https://img.shields.io/badge/Tests-14%20Passed-brightgreen)](tests/api.test.ts)
 [![Quotes](https://img.shields.io/badge/Quotes%20Bank-394%20Quotes-orange)](#status-codes-and-quote-catalog)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-brightgreen?logo=github)](docs/index.html)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-brightgreen?logo=github)](https://anasysuf.github.io/witty-status-api/)
 
 A developer-friendly REST API and responsive HTML renderer for handling HTTP errors, scheduled maintenance, and downtime. It replaces cold, confusing stack traces with witty, relatable, and reassuring English copy while still providing structured diagnostic data and actionable recovery advice.
 
@@ -73,10 +73,11 @@ npm test
 
 ### 5. Client-Side Live Demo (GitHub Pages)
 
-The repository includes a 100% self-contained client-side demo under the `docs/` folder:
+The repository includes a 100% self-contained client-side demo directly at `index.html`:
 
-- **Local Preview**: Open `docs/index.html` directly in any web browser without needing any backend server!
-- **GitHub Pages**: Go to your repository **Settings** > **Pages** > Select **Deploy from a branch** > Choose **`main`** branch and **`/docs`** folder > Click **Save**.
+- **Live URL**: [https://anasysuf.github.io/witty-status-api/](https://anasysuf.github.io/witty-status-api/)
+- **Local Preview**: Open `index.html` directly in any web browser without needing any backend server!
+- **GitHub Pages Configuration**: Go to repository **Settings** > **Pages** > Select **Deploy from a branch** > Choose **`main`** branch and **`/ (root)`** folder > Click **Save**.
 - Automated deployment is also supported via `.github/workflows/pages.yml`.
 
 ---
