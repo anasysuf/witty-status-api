@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WittyStatus API: Interactive Playground & Live Demo</title>
-  <meta name="description" content="Explore and test witty, relatable, and professional HTTP error and downtime status handling library and API.">
+  <title>WittyStatus API: Interactive Playground & API Documentation</title>
+  <meta name="description" content="Interactive playground and complete API reference for WittyStatus API - witty, relatable HTTP error handling and status pages.">
   <style>
     :root {
       --bg: #0b1120;
@@ -19,6 +19,8 @@
       --code-bg: #020617;
       --badge-bg: rgba(56, 189, 248, 0.12);
       --badge-text: #38bdf8;
+      --method-get-bg: rgba(16, 185, 129, 0.15);
+      --method-get-text: #34d399;
       --focus-ring: #38bdf8;
       --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
     }
@@ -36,6 +38,8 @@
       --code-bg: #f1f5f9;
       --badge-bg: rgba(2, 132, 199, 0.12);
       --badge-text: #0284c7;
+      --method-get-bg: rgba(5, 150, 105, 0.12);
+      --method-get-text: #059669;
       --focus-ring: #0284c7;
       --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
     }
@@ -51,13 +55,13 @@
       background-color: var(--bg);
       color: var(--text);
       line-height: 1.5;
-      padding: 32px 16px;
+      padding: 24px 16px;
       transition: background-color 0.2s ease, color 0.2s ease;
       min-height: 100vh;
     }
 
     .wrapper {
-      max-width: 1040px;
+      max-width: 1060px;
       margin: 0 auto;
     }
 
@@ -65,7 +69,7 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       gap: 16px;
       flex-wrap: wrap;
     }
@@ -92,7 +96,7 @@
 
     .brand-subtitle {
       color: var(--text-muted);
-      font-size: 1.05rem;
+      font-size: 1.025rem;
       margin-top: 6px;
     }
 
@@ -135,9 +139,89 @@
       border-color: var(--primary-hover);
     }
 
+    .btn-sm {
+      min-height: 32px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+    }
+
     .btn:focus-visible, select:focus-visible {
       outline: 2px solid var(--focus-ring);
       outline-offset: 2px;
+    }
+
+    /* Main Navigation (Playground vs Docs) */
+    .main-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .main-nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .main-nav-btn:hover {
+      color: var(--text);
+      background: var(--surface-hover);
+    }
+
+    .main-nav-btn.active {
+      color: var(--primary-contrast);
+      background: var(--primary);
+    }
+
+    /* Views */
+    .view-section {
+      display: none;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    /* Code Pills */
+    .pills-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .pill {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pill:hover {
+      color: var(--text);
+      border-color: var(--primary);
+    }
+
+    .pill.active {
+      background: var(--primary);
+      color: var(--primary-contrast);
+      border-color: var(--primary);
     }
 
     /* Grid Layout */
@@ -173,38 +257,7 @@
       justify-content: space-between;
     }
 
-    /* Code Pills */
-    .pills-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .pill {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .pill:hover {
-      color: var(--text);
-      border-color: var(--primary);
-    }
-
-    .pill.active {
-      background: var(--primary);
-      color: var(--primary-contrast);
-      border-color: var(--primary);
-    }
-
-    /* Selector Controls */
+    /* Controls */
     .controls-row {
       display: flex;
       gap: 12px;
@@ -336,7 +389,7 @@
       margin-top: 12px;
     }
 
-    /* Live Preview Modal / Container */
+    /* Live Preview Section */
     .preview-section {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -371,12 +424,174 @@
       background: var(--bg);
     }
 
+    /* ================================================= */
+    /* DOCS / API REFERENCE STYLES                       */
+    /* ================================================= */
+    .docs-intro {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 28px;
+    }
+
+    .docs-intro h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .docs-intro p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+
+    .docs-nav-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .docs-nav-link {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .docs-nav-link:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .endpoint-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .method-badge {
+      background: var(--method-get-bg);
+      color: var(--method-get-text);
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 4px 10px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    .endpoint-path {
+      font-family: ui-monospace, monospace;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .endpoint-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+
+    .params-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 0.875rem;
+    }
+
+    .params-table th, .params-table td {
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    .params-table th {
+      background: var(--code-bg);
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .params-table td {
+      background: var(--surface);
+    }
+
+    .param-name {
+      font-family: ui-monospace, monospace;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .param-badge {
+      font-size: 0.75rem;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--text-muted);
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      margin-bottom: 16px;
+    }
+
+    .catalog-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .catalog-table th, .catalog-table td {
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      text-align: left;
+    }
+
+    .catalog-table th {
+      background: var(--code-bg);
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .catalog-table td {
+      background: var(--surface);
+    }
+
+    .status-badge-table {
+      font-family: ui-monospace, monospace;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      display: inline-block;
+    }
+
     footer {
       text-align: center;
       color: var(--text-muted);
       font-size: 0.85rem;
-      padding: 20px 0;
+      padding: 24px 0;
       border-top: 1px solid var(--border);
+      margin-top: 32px;
     }
   </style>
 </head>
@@ -386,9 +601,9 @@
       <div>
         <h1 class="brand-title">
           WittyStatus API
-          <span class="brand-tag">394 Quotes Catalog</span>
+          <span class="brand-tag">394 Quotes Bank</span>
         </h1>
-        <p class="brand-subtitle">Interactive developer playground and client-side live demo</p>
+        <p class="brand-subtitle">Interactive developer playground and comprehensive API documentation</p>
       </div>
 
       <div class="nav-actions">
@@ -399,74 +614,261 @@
       </div>
     </header>
 
-    <div class="pills-container" id="pillsContainer">
-      <!-- Status code badges rendered by script -->
-    </div>
+    <!-- Main Navigation: Playground vs Docs -->
+    <nav class="main-nav" aria-label="Primary Navigation">
+      <button id="navPlaygroundBtn" class="main-nav-btn active" type="button">
+        <span>&#x26a1; Interactive Playground</span>
+      </button>
+      <button id="navDocsBtn" class="main-nav-btn" type="button">
+        <span>&#x1f4d6; API Documentation</span>
+      </button>
+    </nav>
 
-    <div class="dashboard-grid">
-      <!-- Left Card: Status Selector & Live Quote Spotlight -->
-      <section class="card">
-        <h2 class="card-title">
-          <span>Quote Spotlight</span>
-          <button id="shuffleBtn" class="btn btn-primary" type="button">
-            <span>&#x21bb; Shuffle Quote</span>
-          </button>
-        </h2>
+    <!-- ================================================= -->
+    <!-- VIEW 1: INTERACTIVE PLAYGROUND                    -->
+    <!-- ================================================= -->
+    <main id="playgroundView" class="view-section active">
+      <div class="pills-container" id="pillsContainer">
+        <!-- Status code badges rendered dynamically -->
+      </div>
 
-        <div class="controls-row">
-          <select id="codeSelect" class="select-control" aria-label="Select HTTP status code">
-            <!-- Populated dynamically -->
-          </select>
-        </div>
+      <div class="dashboard-grid">
+        <!-- Left Card: Status Selector & Live Quote Spotlight -->
+        <section class="card">
+          <h2 class="card-title">
+            <span>Quote Spotlight</span>
+            <button id="shuffleBtn" class="btn btn-primary" type="button">
+              <span>&#x21bb; Shuffle Quote</span>
+            </button>
+          </h2>
 
-        <div class="counter-text" id="counterText">Quote 1 of 30</div>
-
-        <div class="spotlight" id="spotlightBox">
-          <span class="spotlight-badge" id="spotlightBadge">HTTP 404 &bull; Not Found</span>
-          <h3 class="spotlight-headline" id="spotlightHeadline">This page went on an existential walk</h3>
-          <p class="spotlight-quote" id="spotlightQuote">"We searched every digital nook and database cranny..."</p>
-          <div class="spotlight-details">
-            <div><strong>Technical:</strong> <span id="spotlightTech">Target route missing.</span></div>
-            <div><strong>Suggested Step:</strong> <span id="spotlightAdvice">Check URL or return home.</span></div>
-            <div><strong>Action Type:</strong> <span id="spotlightAction">back</span></div>
+          <div class="controls-row">
+            <select id="codeSelect" class="select-control" aria-label="Select HTTP status code">
+              <!-- Populated dynamically -->
+            </select>
           </div>
+
+          <div class="counter-text" id="counterText">Quote 1 of 30</div>
+
+          <div class="spotlight" id="spotlightBox">
+            <span class="spotlight-badge" id="spotlightBadge">HTTP 404 &bull; Not Found</span>
+            <h3 class="spotlight-headline" id="spotlightHeadline">This page went on an existential walk</h3>
+            <p class="spotlight-quote" id="spotlightQuote">"We searched every digital nook and database cranny..."</p>
+            <div class="spotlight-details">
+              <div><strong>Technical:</strong> <span id="spotlightTech">Target route missing.</span></div>
+              <div><strong>Suggested Step:</strong> <span id="spotlightAdvice">Check URL or return home.</span></div>
+              <div><strong>Action Type:</strong> <span id="spotlightAction">back</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right Card: JSON Response & Code Snippets -->
+        <section class="card">
+          <div class="tab-bar">
+            <button class="tab-btn active" data-tab="json" type="button">Response JSON</button>
+            <button class="tab-btn" data-tab="fetch" type="button">Fetch (JS)</button>
+            <button class="tab-btn" data-tab="curl" type="button">cURL</button>
+            <button class="tab-btn" data-tab="express" type="button">Express</button>
+            <button class="tab-btn" data-tab="nextjs" type="button">Next.js</button>
+          </div>
+
+          <pre id="outputPre">Loading...</pre>
+
+          <div class="code-actions">
+            <button id="copyBtn" class="btn" type="button">Copy to Clipboard</button>
+          </div>
+        </section>
+      </div>
+
+      <!-- Live Rendered HTML View Section -->
+      <section class="preview-section">
+        <div class="preview-header">
+          <div>
+            <h2 style="font-size: 1.2rem; font-weight: 700;">Live Rendered Page Preview</h2>
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 2px;">
+              Accessible standalone HTML view rendered completely client-side in an isolated sandbox. Click <strong>"Try Again"</strong> inside the preview to reload quotes!
+            </p>
+          </div>
+          <button id="refreshPreviewBtn" class="btn" type="button">Reload Preview</button>
+        </div>
+
+        <div class="preview-frame-container">
+          <iframe id="previewFrame" title="Error Page Live Preview"></iframe>
+        </div>
+      </section>
+    </main>
+
+    <!-- ================================================= -->
+    <!-- VIEW 2: API DOCUMENTATION & REFERENCE             -->
+    <!-- ================================================= -->
+    <article id="docsView" class="view-section">
+      <div class="docs-intro">
+        <h2>REST API Reference</h2>
+        <p>
+          WittyStatus API provides structured, developer-friendly JSON payloads and self-contained HTML pages for HTTP error handling, maintenance alerts, and downtime reassurance.
+        </p>
+        <div class="docs-nav-pills">
+          <a href="#endpoint-errors" class="docs-nav-link">&#x2192; Error Payload (:code)</a>
+          <a href="#endpoint-random" class="docs-nav-link">&#x2192; Random Quote</a>
+          <a href="#endpoint-quotes" class="docs-nav-link">&#x2192; List Quotes</a>
+          <a href="#endpoint-maintenance" class="docs-nav-link">&#x2192; Maintenance State</a>
+          <a href="#endpoint-health" class="docs-nav-link">&#x2192; Health Check</a>
+          <a href="#status-catalog" class="docs-nav-link">&#x2192; Status Code Catalog</a>
+        </div>
+      </div>
+
+      <!-- 1. GET /api/v1/errors/:code -->
+      <section id="endpoint-errors" class="endpoint-card">
+        <div class="endpoint-header">
+          <span class="method-badge">GET</span>
+          <span class="endpoint-path">/api/v1/errors/:code</span>
+          <button class="btn btn-sm btn-primary" type="button" onclick="testInPlayground(404)">Test in Playground</button>
+        </div>
+        <p class="endpoint-desc">
+          Returns a complete diagnostic error response with a randomized witty message, technical root cause, and concrete user recovery advice.
+        </p>
+
+        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">Path Parameters</h4>
+        <div class="table-responsive">
+          <table class="params-table">
+            <thead>
+              <tr>
+                <th>Parameter</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="param-name">code</span></td>
+                <td><span class="param-badge">integer</span></td>
+                <td><strong>Yes</strong></td>
+                <td>Target HTTP status code (must be between <code>400</code> and <code>599</code>). Graceful fallback generated if unmapped.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">Example Response (HTTP 404)</h4>
+        <pre>{
+  "success": false,
+  "status": 404,
+  "title": "Not Found",
+  "headline": "This page went on an existential walk",
+  "wittyMessage": "We searched every digital nook and database cranny. This page appears to have vanished into thin air.",
+  "technicalDetails": "Target route is missing from active Fastify route tables.",
+  "actionAdvice": "Verify your path segments or return to the base application url.",
+  "suggestedAction": "back",
+  "timestamp": "2026-08-31T12:00:00.000Z",
+  "requestId": "req_a8x9z"
+}</pre>
+      </section>
+
+      <!-- 2. GET /api/v1/quotes/random -->
+      <section id="endpoint-random" class="endpoint-card">
+        <div class="endpoint-header">
+          <span class="method-badge">GET</span>
+          <span class="endpoint-path">/api/v1/quotes/random</span>
+          <button class="btn btn-sm btn-primary" type="button" onclick="testInPlayground(500)">Test in Playground</button>
+        </div>
+        <p class="endpoint-desc">
+          Fetches a single random witty status quote object. Supports optional filtering by status code or category.
+        </p>
+
+        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">Query Parameters</h4>
+        <div class="table-responsive">
+          <table class="params-table">
+            <thead>
+              <tr>
+                <th>Parameter</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="param-name">code</span></td>
+                <td><span class="param-badge">integer</span></td>
+                <td>No</td>
+                <td>Filter by HTTP code (e.g. <code>404</code>, <code>500</code>, <code>429</code>).</td>
+              </tr>
+              <tr>
+                <td><span class="param-name">category</span></td>
+                <td><span class="param-badge">string</span></td>
+                <td>No</td>
+                <td>Filter by category: <code>client_error</code>, <code>server_error</code>, or <code>maintenance</code>.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
-      <!-- Right Card: JSON Response & Code Snippets -->
-      <section class="card">
-        <div class="tab-bar">
-          <button class="tab-btn active" data-tab="json" type="button">Response JSON</button>
-          <button class="tab-btn" data-tab="fetch" type="button">Fetch (JS)</button>
-          <button class="tab-btn" data-tab="curl" type="button">cURL</button>
-          <button class="tab-btn" data-tab="express" type="button">Express</button>
-          <button class="tab-btn" data-tab="nextjs" type="button">Next.js</button>
+      <!-- 3. GET /api/v1/quotes -->
+      <section id="endpoint-quotes" class="endpoint-card">
+        <div class="endpoint-header">
+          <span class="method-badge">GET</span>
+          <span class="endpoint-path">/api/v1/quotes</span>
         </div>
+        <p class="endpoint-desc">
+          Returns an array containing all status quotes currently registered in the quote bank (394 quotes total).
+        </p>
+      </section>
 
-        <pre id="outputPre">Loading...</pre>
+      <!-- 4. GET /api/v1/maintenance -->
+      <section id="endpoint-maintenance" class="endpoint-card">
+        <div class="endpoint-header">
+          <span class="method-badge">GET</span>
+          <span class="endpoint-path">/api/v1/maintenance</span>
+          <button class="btn btn-sm btn-primary" type="button" onclick="testInPlayground('maintenance')">Test in Playground</button>
+        </div>
+        <p class="endpoint-desc">
+          Returns live structured maintenance status with simulated progress percentage, current technical task, and estimated completion time with HTTP 503 status.
+        </p>
+      </section>
 
-        <div class="code-actions">
-          <button id="copyBtn" class="btn" type="button">Copy to Clipboard</button>
+      <!-- 5. GET /api/v1/health -->
+      <section id="endpoint-health" class="endpoint-card">
+        <div class="endpoint-header">
+          <span class="method-badge">GET</span>
+          <span class="endpoint-path">/api/v1/health</span>
+        </div>
+        <p class="endpoint-desc">
+          System health check endpoint returning server status, uptime seconds, and ISO timestamp.
+        </p>
+        <pre>{
+  "status": "healthy",
+  "uptime": 142.5,
+  "timestamp": "2026-08-31T12:00:00.000Z"
+}</pre>
+      </section>
+
+      <!-- Status Code Catalog Table -->
+      <section id="status-catalog" class="endpoint-card">
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 8px;">Status Code Catalog (394 Quotes Bank)</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+          Each major status code includes exactly 30 human-crafted quotes covering engineering themes, plus dedicated teasers and maintenance responses.
+        </p>
+
+        <div class="table-responsive">
+          <table class="catalog-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Standard Name</th>
+                <th>Quotes</th>
+                <th>Themes Covered</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="catalogTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
         </div>
       </section>
-    </div>
-
-    <!-- Live Rendered HTML View Section -->
-    <section class="preview-section">
-      <div class="preview-header">
-        <div>
-          <h2 style="font-size: 1.2rem; font-weight: 700;">Live Rendered Page Preview</h2>
-          <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 2px;">
-            Accessible standalone HTML view rendered completely client-side in an isolated sandbox.
-          </p>
-        </div>
-        <button id="refreshPreviewBtn" class="btn" type="button">Reload Preview</button>
-      </div>
-
-      <div class="preview-frame-container">
-        <iframe id="previewFrame" title="Error Page Live Preview"></iframe>
-      </div>
-    </section>
+    </article>
 
     <footer>
       WittyStatus API &bull; Released under the MIT License &bull; Runs 100% locally and on GitHub Pages
@@ -477,6 +879,25 @@
   <script>
     (function () {
       const CODES = [400, 401, 403, 404, 405, 408, 409, 422, 429, 500, 502, 503, 504, 418, 501, 'maintenance'];
+      const CODE_DETAILS = [
+        { code: 400, name: 'Bad Request', count: 30, themes: 'Syntax scrambles, trailing commas, cat on keyboard, unbalanced brackets, duplicate keys' },
+        { code: 401, name: 'Unauthorized', count: 30, themes: 'Secret handshakes, keys in other coat, expired tokens, clock skew, revoked badges' },
+        { code: 403, name: 'Forbidden', count: 30, themes: 'Velvet rope, need to know, read-only modes, tenant mismatch, geoblocking' },
+        { code: 404, name: 'Not Found', count: 30, themes: 'Existential walks, typo gremlins, unpushed branches, Schroedinger page, desert islands' },
+        { code: 405, name: 'Method Not Allowed', count: 30, themes: 'Pulling on push door, deleting museum pieces, GET on payments, invalid HTTP verbs' },
+        { code: 408, name: 'Request Timeout', count: 30, themes: 'Carrier pigeons, dial-up modems, subway tunnels, high ping monsters, frozen streams' },
+        { code: 409, name: 'Conflict', count: 30, themes: 'Fast lane collisions, double clicks, git merge conflicts, taken slugs, optimistic locking' },
+        { code: 422, name: 'Unprocessable Entity', count: 30, themes: 'End before start date, future birthdates, negative balances, 150% discounts' },
+        { code: 429, name: 'Too Many Requests', count: 30, themes: 'Speed racers, caffeine overloads, F5 drum solos, runaway loops, token bucket empty' },
+        { code: 500, name: 'Internal Server Error', count: 30, themes: 'Unruly semicolons, Friday afternoon deploys, wild null pointers, out of memory' },
+        { code: 502, name: 'Bad Gateway', count: 30, themes: 'Upstream ghosting, telephone games, startup crashes, header too big, Nginx heavy sighs' },
+        { code: 503, name: 'Service Unavailable', count: 30, themes: 'Swapping hamsters, scheduled pit stops, vacuuming DB rugs, database migrations' },
+        { code: 504, name: 'Gateway Timeout', count: 30, themes: 'Upstream daydreams, scenic database routes, serverless cold starts, third-party sloths' },
+        { code: 418, name: "I'm a Teapot", count: 2, themes: 'RFC 2324 authentic teapot refusing espresso, Earl Grey only beverage' },
+        { code: 501, name: 'Not Implemented', count: 2, themes: 'Whiteboard marker drawings, sprint backlog items slated for next quarter' },
+        { code: 'maintenance', name: 'Maintenance Mode', count: 1, themes: 'Dedicated real-time maintenance state with progress bar' }
+      ];
+
       let currentCode = 404;
       let currentQuoteIndex = 0;
       let currentTab = 'json';
@@ -492,6 +913,37 @@
       const themeToggle = document.getElementById('themeToggle');
       const themeIcon = document.getElementById('themeIcon');
       const themeLabel = document.getElementById('themeLabel');
+
+      // Navigation views
+      const navPlaygroundBtn = document.getElementById('navPlaygroundBtn');
+      const navDocsBtn = document.getElementById('navDocsBtn');
+      const playgroundView = document.getElementById('playgroundView');
+      const docsView = document.getElementById('docsView');
+
+      function switchView(viewName) {
+        if (viewName === 'docs') {
+          navPlaygroundBtn.classList.remove('active');
+          navDocsBtn.classList.add('active');
+          playgroundView.classList.remove('active');
+          docsView.classList.add('active');
+          window.location.hash = 'docs';
+        } else {
+          navDocsBtn.classList.remove('active');
+          navPlaygroundBtn.classList.add('active');
+          docsView.classList.remove('active');
+          playgroundView.classList.add('active');
+          window.location.hash = 'playground';
+        }
+      }
+
+      navPlaygroundBtn.addEventListener('click', () => switchView('playground'));
+      navDocsBtn.addEventListener('click', () => switchView('docs'));
+
+      window.testInPlayground = function (code) {
+        switchView('playground');
+        setCode(code);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
 
       // Theme toggle
       function updateTheme(theme) {
@@ -532,6 +984,20 @@
         opt.textContent = code === 'maintenance' ? 'Maintenance (503 Service Unavailable)' : `HTTP ${code}`;
         if (code === 404) opt.selected = true;
         codeSelect.appendChild(opt);
+      });
+
+      // Populate Catalog Table in Docs
+      const catalogTableBody = document.getElementById('catalogTableBody');
+      CODE_DETAILS.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="status-badge-table">${item.code === 'maintenance' ? '503' : item.code}</span></td>
+          <td><strong>${item.name}</strong></td>
+          <td>${item.count} quotes</td>
+          <td style="color: var(--text-muted); font-size: 0.85rem;">${item.themes}</td>
+          <td><button class="btn btn-sm btn-primary" onclick="testInPlayground('${item.code}')">Test</button></td>
+        `;
+        catalogTableBody.appendChild(tr);
       });
 
       codeSelect.addEventListener('change', (e) => {
@@ -808,6 +1274,11 @@
       });
 
       refreshPreviewBtn.addEventListener('click', renderIframe);
+
+      // Handle initial URL hash
+      if (window.location.hash === '#docs') {
+        switchView('docs');
+      }
 
       // Initial execution
       setCode(404);
