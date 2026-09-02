@@ -49,6 +49,12 @@ export async function buildApp(): Promise<FastifyInstance> {
     }
   });
 
+  // Set baseline security headers
+  app.addHook('onSend', async (_request, reply) => {
+    reply.header('x-content-type-options', 'nosniff');
+    reply.header('x-frame-options', 'SAMEORIGIN');
+  });
+
   // Register HTML render routes
   await app.register(renderRoutes);
 
@@ -59,7 +65,10 @@ export async function buildApp(): Promise<FastifyInstance> {
   app.setNotFoundHandler(async (request, reply) => {
     if (request.url.startsWith('/api/')) {
       const payload = statusService.buildErrorPayload(404);
-      reply.status(404).send(payload);
+      reply
+        .status(404)
+        .header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        .send(payload);
     } else {
       reply.redirect('/render/error/404');
     }

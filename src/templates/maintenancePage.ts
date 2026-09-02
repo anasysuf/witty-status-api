@@ -1,11 +1,22 @@
 import { MaintenanceStatus, BrandOptions } from '../types/index.js';
+import { escapeHtml, sanitizeCssColor, sanitizeUrl } from '../utils/sanitize.js';
 
 export function renderMaintenancePage(data: MaintenanceStatus, brand?: BrandOptions): string {
-  const brandName = brand?.brandName || 'System Maintenance';
-  const customPrimary = brand?.primaryColor ? `--primary: ${brand.primaryColor}; --focus-ring: ${brand.primaryColor};` : '';
-  const supportEmail = brand?.supportEmail || data.supportEmail;
-  const supportUrl = brand?.supportUrl;
-  const pageTitle = brand?.brandName ? `${data.wittyHeadline} | ${brandName}` : 'System Maintenance in Progress';
+  const brandName = escapeHtml(brand?.brandName || 'System Maintenance');
+  const safePrimary = sanitizeCssColor(brand?.primaryColor);
+  const customPrimary = safePrimary ? `--primary: ${safePrimary}; --focus-ring: ${safePrimary};` : '';
+  const safeSupportEmail = escapeHtml(brand?.supportEmail || data.supportEmail);
+  const safeSupportUrl = sanitizeUrl(brand?.supportUrl);
+  const safeLogoUrl = sanitizeUrl(brand?.logoUrl);
+
+  const safeHeadline = escapeHtml(data.wittyHeadline);
+  const safeMessage = escapeHtml(data.message);
+  const safeActivity = escapeHtml(data.currentActivity);
+  const safeProgress = Math.min(100, Math.max(0, Number(data.progressPercent) || 0));
+  const safeDuration = escapeHtml(data.estimatedDuration);
+  const safeCompletion = escapeHtml(data.estimatedCompletion);
+
+  const pageTitle = brand?.brandName ? `${safeHeadline} | ${brandName}` : 'System Maintenance in Progress';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -13,7 +24,7 @@ export function renderMaintenancePage(data: MaintenanceStatus, brand?: BrandOpti
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${pageTitle}</title>
-  <meta name="description" content="${data.wittyHeadline}">
+  <meta name="description" content="${safeHeadline}">
   <style>
     :root {
       --bg: #0f172a;
@@ -24,10 +35,9 @@ export function renderMaintenancePage(data: MaintenanceStatus, brand?: BrandOpti
       --primary: #38bdf8;
       --primary-hover: #0284c7;
       --primary-contrast: #0f172a;
-      ${customPrimary}
-    }
       --progress-bg: #334155;
       --focus-ring: #38bdf8;
+      ${customPrimary}
     }
 
     [data-theme="light"] {
@@ -252,7 +262,7 @@ export function renderMaintenancePage(data: MaintenanceStatus, brand?: BrandOpti
   <div class="container">
     <div class="top-bar">
       <div style="display:flex; align-items:center; gap:12px;">
-        ${brand?.logoUrl ? `<img src="${brand.logoUrl}" alt="${brandName} Logo" style="height:24px; width:auto; border-radius:4px;">` : ''}
+        ${safeLogoUrl ? `<img src="${safeLogoUrl}" alt="${brandName} Logo" style="height:24px; width:auto; border-radius:4px;">` : ''}
         <div class="status-indicator">
           <span class="pulse-dot"></span>
           <span>${brandName} Maintenance</span>
@@ -265,15 +275,15 @@ export function renderMaintenancePage(data: MaintenanceStatus, brand?: BrandOpti
     </div>
 
     <main class="card">
-      <h1>${data.wittyHeadline}</h1>
-      <p class="subheading">${data.message}</p>
+      <h1>${safeHeadline}</h1>
+      <p class="subheading">${safeMessage}</p>
 
       <div class="progress-box">
         <div class="progress-header">
-          <span>Current Task: ${data.currentActivity}</span>
-          <span id="progressText">${data.progressPercent}%</span>
+          <span>Current Task: ${safeActivity}</span>
+          <span id="progressText">${safeProgress}%</span>
         </div>
-        <div class="progress-bar-container" role="progressbar" aria-valuenow="${data.progressPercent}" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar-container" role="progressbar" aria-valuenow="${safeProgress}" aria-valuemin="0" aria-valuemax="100">
           <div class="progress-bar-fill" id="progressBar"></div>
         </div>
       </div>
@@ -281,11 +291,11 @@ export function renderMaintenancePage(data: MaintenanceStatus, brand?: BrandOpti
       <div class="info-grid">
         <div class="info-item">
           <div class="info-label">Estimated Window</div>
-          <div class="info-value">${data.estimatedDuration}</div>
+          <div class="info-value">${safeDuration}</div>
         </div>
         <div class="info-item">
           <div class="info-label">Estimated Ready Time</div>
-          <div class="info-value">${data.estimatedCompletion}</div>
+          <div class="info-value">${safeCompletion}</div>
         </div>
       </div>
 
@@ -293,8 +303,8 @@ export function renderMaintenancePage(data: MaintenanceStatus, brand?: BrandOpti
         <button class="btn btn-primary" type="button" onclick="window.location.reload()">
           Check Status Now
         </button>
-        ${supportUrl ? `<a class="btn btn-secondary" href="${supportUrl}" target="_blank" rel="noopener noreferrer">Support Center</a>` : ''}
-        ${!supportUrl && supportEmail ? `<a class="btn btn-secondary" href="mailto:${supportEmail}">Contact Support</a>` : ''}
+        ${safeSupportUrl ? `<a class="btn btn-secondary" href="${safeSupportUrl}" target="_blank" rel="noopener noreferrer">Support Center</a>` : ''}
+        ${!safeSupportUrl && safeSupportEmail ? `<a class="btn btn-secondary" href="mailto:${safeSupportEmail}">Contact Support</a>` : ''}
       </div>
     </main>
 

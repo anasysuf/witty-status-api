@@ -161,5 +161,27 @@ describe('WittyStatus API Suite', () => {
     expect(res.text).toContain('#6366f1');
     expect(res.text).toContain('https://help.acme.com');
   });
+
+  it('GET /render/error/404 sanitizes malicious brand scripts and unsafe protocols', async () => {
+    const res = await request(app.server)
+      .get('/render/error/404?brand=%3Cscript%3Ealert(1)%3C%2Fscript%3E&support=javascript:alert(2)');
+    expect(res.status).toBe(404);
+    expect(res.text).not.toContain('<script>alert(1)</script>');
+    expect(res.text).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
+    expect(res.text).not.toContain('href="javascript:alert(2)"');
+  });
+
+  it('Responses include appropriate security and Cache-Control headers', async () => {
+    const healthRes = await request(app.server).get('/api/v1/health');
+    expect(healthRes.headers['x-content-type-options']).toBe('nosniff');
+    expect(healthRes.headers['cache-control']).toContain('no-cache');
+
+    const quotesRes = await request(app.server).get('/api/v1/quotes');
+    expect(quotesRes.headers['cache-control']).toContain('public');
+
+    const rootRes = await request(app.server).get('/');
+    expect(rootRes.headers['cache-control']).toContain('public');
+  });
 });
+
 

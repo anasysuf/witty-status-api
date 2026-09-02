@@ -9,10 +9,19 @@ const ErrorCodeParamSchema = z.object({
   code: z.coerce.number().int().min(400).max(599)
 });
 
+const RenderQuerySchema = z.object({
+  brand: z.string().max(80).optional(),
+  color: z.string().max(50).optional(),
+  logo: z.string().max(300).optional(),
+  support: z.string().max(300).optional()
+});
+
 export const renderRoutes: FastifyPluginAsync = async (fastify) => {
   // Developer hub and interactive playground
-  fastify.get('/', async (request, reply) => {
-    reply.type('text/html; charset=utf-8');
+  fastify.get('/', async (_request, reply) => {
+    reply
+      .type('text/html; charset=utf-8')
+      .header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
     return renderPlaygroundPage();
   });
 
@@ -21,11 +30,14 @@ export const renderRoutes: FastifyPluginAsync = async (fastify) => {
     const params = ErrorCodeParamSchema.safeParse(request.params);
     const code = params.success ? params.data.code : 404;
     const requestId = (request.headers['x-request-id'] as string) || request.id;
-    const query = request.query as { brand?: string; color?: string; logo?: string; support?: string };
+    const query = RenderQuerySchema.parse(request.query || {});
 
     const payload = statusService.buildErrorPayload(code, undefined, requestId);
-    reply.status(payload.status);
-    reply.type('text/html; charset=utf-8');
+    reply
+      .status(payload.status)
+      .type('text/html; charset=utf-8')
+      .header('Cache-Control', 'no-cache, no-store, must-revalidate');
+
     return renderErrorPage(payload, {
       brandName: query.brand,
       primaryColor: query.color,
@@ -37,9 +49,13 @@ export const renderRoutes: FastifyPluginAsync = async (fastify) => {
   // Render standalone HTML maintenance page
   fastify.get('/render/maintenance', async (request, reply) => {
     const data = statusService.getMaintenanceData();
-    const query = request.query as { brand?: string; color?: string; logo?: string; support?: string };
-    reply.status(503);
-    reply.type('text/html; charset=utf-8');
+    const query = RenderQuerySchema.parse(request.query || {});
+
+    reply
+      .status(503)
+      .type('text/html; charset=utf-8')
+      .header('Cache-Control', 'no-cache, no-store, must-revalidate');
+
     return renderMaintenancePage(data, {
       brandName: query.brand,
       primaryColor: query.color,

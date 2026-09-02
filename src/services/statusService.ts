@@ -1,21 +1,49 @@
+import { randomUUID } from 'node:crypto';
 import { STATUS_QUOTES, MAINTENANCE_DATA } from '../data/quotes.js';
 import { StatusQuote, ErrorResponsePayload, MaintenanceStatus, RFC7807ProblemDetails } from '../types/index.js';
 
 export class StatusService {
+  private readonly quotesByCode = new Map<number, StatusQuote[]>();
+  private readonly quotesByCategory = new Map<string, StatusQuote[]>();
+
+  constructor() {
+    this.indexQuotes();
+  }
+
+  private indexQuotes(): void {
+    for (const quote of STATUS_QUOTES) {
+      // Index by HTTP status code
+      const codeList = this.quotesByCode.get(quote.code);
+      if (codeList) {
+        codeList.push(quote);
+      } else {
+        this.quotesByCode.set(quote.code, [quote]);
+      }
+
+      // Index by category
+      const categoryList = this.quotesByCategory.get(quote.category);
+      if (categoryList) {
+        categoryList.push(quote);
+      } else {
+        this.quotesByCategory.set(quote.category, [quote]);
+      }
+    }
+  }
+
   getAllQuotes(): StatusQuote[] {
     return STATUS_QUOTES;
   }
 
   getQuotesByCode(code: number): StatusQuote[] {
-    return STATUS_QUOTES.filter((q) => q.code === code);
+    return this.quotesByCode.get(code) || [];
   }
 
   getQuotesByCategory(category: string): StatusQuote[] {
-    return STATUS_QUOTES.filter((q) => q.category === category);
+    return this.quotesByCategory.get(category) || [];
   }
 
   getRandomQuote(code?: number, category?: string): StatusQuote {
-    let pool = STATUS_QUOTES;
+    let pool: StatusQuote[] = STATUS_QUOTES;
 
     if (code) {
       const codeFiltered = this.getQuotesByCode(code);
@@ -50,7 +78,7 @@ export class StatusService {
 
   buildErrorPayload(code: number, customMessage?: string, customRequestId?: string): ErrorResponsePayload {
     const quotes = this.getQuotesByCode(code);
-    const id = customRequestId || `req_${Math.random().toString(36).substring(2, 9)}`;
+    const id = customRequestId || `req_${randomUUID().replace(/-/g, '').slice(0, 12)}`;
 
     if (quotes.length > 0) {
       const quote = quotes[Math.floor(Math.random() * quotes.length)];
@@ -122,3 +150,4 @@ export class StatusService {
 }
 
 export const statusService = new StatusService();
+

@@ -1,17 +1,34 @@
 import { ErrorResponsePayload, BrandOptions } from '../types/index.js';
+import { escapeHtml, sanitizeCssColor, sanitizeUrl } from '../utils/sanitize.js';
 
 export function renderErrorPage(payload: ErrorResponsePayload, brand?: BrandOptions): string {
-  const jsonString = JSON.stringify(payload, null, 2);
-  const brandName = brand?.brandName || 'System Response';
-  const customPrimary = brand?.primaryColor ? `--primary: ${brand.primaryColor}; --badge-text: ${brand.primaryColor}; --focus-ring: ${brand.primaryColor};` : '';
+  const jsonString = escapeHtml(JSON.stringify(payload, null, 2));
+  const brandName = escapeHtml(brand?.brandName || 'System Response');
+  const safePrimary = sanitizeCssColor(brand?.primaryColor);
+  const customPrimary = safePrimary
+    ? `--primary: ${safePrimary}; --badge-text: ${safePrimary}; --focus-ring: ${safePrimary};`
+    : '';
+
+  const safeLogoUrl = sanitizeUrl(brand?.logoUrl);
+  const safeSupportUrl = sanitizeUrl(brand?.supportUrl);
+  const safeSupportEmail = brand?.supportEmail ? escapeHtml(brand.supportEmail) : undefined;
+
+  const safeStatus = Number(payload.status) || 500;
+  const safeTitle = escapeHtml(payload.title);
+  const safeHeadline = escapeHtml(payload.headline);
+  const safeWittyMessage = escapeHtml(payload.wittyMessage);
+  const safeTechnicalDetails = escapeHtml(payload.technicalDetails);
+  const safeActionAdvice = escapeHtml(payload.actionAdvice);
+  const safeRequestId = escapeHtml(payload.requestId);
+  const safeTimestamp = escapeHtml(payload.timestamp);
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${payload.status} ${payload.title} | ${brandName}</title>
-  <meta name="description" content="${payload.headline}">
+  <title>${safeStatus} ${safeTitle} | ${brandName}</title>
+  <meta name="description" content="${safeHeadline}">
   <style>
     :root {
       --bg: #0f172a;
@@ -271,7 +288,7 @@ export function renderErrorPage(payload: ErrorResponsePayload, brand?: BrandOpti
   <div class="container">
     <div class="top-bar">
       <div style="display:flex; align-items:center; gap:8px;">
-        ${brand?.logoUrl ? `<img src="${brand.logoUrl}" alt="${brandName} Logo" style="height:24px; width:auto; border-radius:4px;">` : ''}
+        ${safeLogoUrl ? `<img src="${safeLogoUrl}" alt="${brandName} Logo" style="height:24px; width:auto; border-radius:4px;">` : ''}
         <span class="brand">${brandName}</span>
       </div>
       <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle theme">
@@ -281,16 +298,16 @@ export function renderErrorPage(payload: ErrorResponsePayload, brand?: BrandOpti
     </div>
 
     <main class="card">
-      <div class="status-badge" role="status">HTTP ${payload.status} : ${payload.title}</div>
-      <h1>${payload.headline}</h1>
+      <div class="status-badge" role="status">HTTP ${safeStatus} : ${safeTitle}</div>
+      <h1>${safeHeadline}</h1>
 
       <div class="witty-quote">
-        "${payload.wittyMessage}"
+        "${safeWittyMessage}"
       </div>
 
       <div class="advice-section">
-        <p><strong>What occurred:</strong> ${payload.technicalDetails}</p>
-        <p><strong>Suggested step:</strong> ${payload.actionAdvice}</p>
+        <p><strong>What occurred:</strong> ${safeTechnicalDetails}</p>
+        <p><strong>Suggested step:</strong> ${safeActionAdvice}</p>
       </div>
 
       <div class="actions">
@@ -300,8 +317,8 @@ export function renderErrorPage(payload: ErrorResponsePayload, brand?: BrandOpti
         <button id="backBtn" class="btn btn-secondary" type="button" onclick="window.history.back()">
           Go Back
         </button>
-        ${brand?.supportUrl ? `<a class="btn btn-secondary" href="${brand.supportUrl}" target="_blank" rel="noopener noreferrer">Support Center</a>` : ''}
-        ${!brand?.supportUrl && brand?.supportEmail ? `<a class="btn btn-secondary" href="mailto:${brand.supportEmail}">Contact Support</a>` : ''}
+        ${safeSupportUrl ? `<a class="btn btn-secondary" href="${safeSupportUrl}" target="_blank" rel="noopener noreferrer">Support Center</a>` : ''}
+        ${!safeSupportUrl && safeSupportEmail ? `<a class="btn btn-secondary" href="mailto:${safeSupportEmail}">Contact Support</a>` : ''}
       </div>
 
       <details>
@@ -314,7 +331,7 @@ export function renderErrorPage(payload: ErrorResponsePayload, brand?: BrandOpti
     </main>
 
     <footer class="footer-meta">
-      Request ID: <code>${payload.requestId}</code> &bull; Timestamp: ${payload.timestamp}
+      Request ID: <code>${safeRequestId}</code> &bull; Timestamp: ${safeTimestamp}
     </footer>
   </div>
 

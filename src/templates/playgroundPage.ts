@@ -1,5 +1,11 @@
+let cachedPlaygroundHtml: string | null = null;
+
 export function renderPlaygroundPage(): string {
-  return `<!DOCTYPE html>
+  if (cachedPlaygroundHtml) {
+    return cachedPlaygroundHtml;
+  }
+
+  cachedPlaygroundHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -487,4 +493,6 @@ export function renderPlaygroundPage(): string {
   </script>
 </body>
 </html>`;
+
+  return cachedPlaygroundHtml;
 }

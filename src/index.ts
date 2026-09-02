@@ -30,6 +30,9 @@ export { wittyFastifyPlugin, type WittyFastifyPluginOptions } from './middleware
 // Fastify application builder
 export { buildApp } from './app.js';
 
+// Security and sanitization utilities
+export { escapeHtml, sanitizeCssColor, sanitizeUrl } from './utils/sanitize.js';
+
 // TypeScript types
 export type {
   StatusQuote,

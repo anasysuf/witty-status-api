@@ -37,7 +37,8 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
     },
-    async () => {
+    async (_request, reply) => {
+      reply.header('Cache-Control', 'no-cache, no-store, must-revalidate');
       return {
         status: 'healthy',
         uptime: process.uptime(),
@@ -62,7 +63,8 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
     },
-    async (request) => {
+    async (request, reply) => {
+      reply.header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
       const query = RandomQuerySchema.parse(request.query);
       if (query.code) {
         return { data: statusService.getQuotesByCode(query.code) };
@@ -90,7 +92,8 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
     },
-    async (request) => {
+    async (request, reply) => {
+      reply.header('Cache-Control', 'no-cache, no-store, must-revalidate');
       const query = RandomQuerySchema.parse(request.query);
       const quote = statusService.getRandomQuote(query.code, query.category);
       return {
@@ -151,6 +154,8 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
           acceptHeader.includes('text/html') &&
           !acceptHeader.includes('application/json'));
 
+      reply.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+
       if (wantsHtml) {
         const payload = statusService.buildErrorPayload(params.data.code, undefined, requestId);
         reply.status(payload.status).type('text/html; charset=utf-8');
@@ -180,7 +185,9 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       const maintenance = statusService.getMaintenanceData();
-      reply.status(503);
+      reply
+        .status(503)
+        .header('Cache-Control', 'no-cache, no-store, must-revalidate');
       return {
         success: false,
         status: 503,
