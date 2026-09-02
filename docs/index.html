@@ -150,6 +150,180 @@
       outline-offset: 2px;
     }
 
+    /* API Status & Control Bar */
+    .api-status-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      box-shadow: var(--card-shadow);
+    }
+
+    .api-status-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #94a3b8;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+
+    .status-dot.online {
+      background: #10b981;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+    }
+
+    .status-dot.offline {
+      background: #f59e0b;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+    }
+
+    .api-status-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .api-latency-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      color: var(--primary);
+    }
+
+    .api-status-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .api-url-input {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: ui-monospace, monospace;
+      font-size: 0.85rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      min-width: 220px;
+    }
+
+    .api-url-input:focus {
+      outline: 2px solid var(--focus-ring);
+    }
+
+    /* Response Header Bar */
+    .response-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      padding: 8px 14px;
+      font-size: 0.825rem;
+      font-family: ui-monospace, monospace;
+    }
+
+    .resp-endpoint-display {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .resp-status-badge {
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.775rem;
+    }
+
+    .resp-status-badge.status-2xx {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+    }
+
+    .resp-status-badge.status-4xx {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+    }
+
+    .resp-status-badge.status-5xx {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+    }
+
+    .resp-status-badge.status-local {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+    }
+
+    /* Brand Config Bar */
+    .brand-config-bar {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .config-input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .brand-input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .brand-input:focus {
+      outline: 2px solid var(--focus-ring);
+    }
+
+    .color-picker-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .color-picker {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: none;
+    }
+
     /* Main Navigation (Playground vs Docs) */
     .main-nav {
       display: flex;
@@ -370,7 +544,8 @@
     pre {
       background: var(--code-bg);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-top: none;
+      border-radius: 0 0 6px 6px;
       padding: 16px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       font-size: 0.825rem;
@@ -628,6 +803,22 @@
     <!-- VIEW 1: INTERACTIVE PLAYGROUND                    -->
     <!-- ================================================= -->
     <main id="playgroundView" class="view-section active">
+      <!-- API Live Connection & Control Toolbar -->
+      <div class="api-status-bar" id="apiStatusBar">
+        <div class="api-status-info">
+          <span class="status-dot" id="apiStatusDot"></span>
+          <span class="api-status-label" id="apiStatusLabel">Detecting REST API...</span>
+          <span class="api-latency-tag" id="apiLatencyTag" style="display:none">0ms</span>
+        </div>
+        <div class="api-status-controls">
+          <input type="text" id="apiUrlInput" class="api-url-input" value="http://localhost:3001" placeholder="API Base URL (e.g. http://localhost:3001)" aria-label="API Base URL" />
+          <button id="apiConnectBtn" class="btn btn-sm btn-primary" type="button">Connect</button>
+          <button id="apiModeToggle" class="btn btn-sm" type="button" title="Toggle between Live REST API calls and Offline Catalog mode">
+            Mode: <strong id="apiModeText">Live API</strong>
+          </button>
+        </div>
+      </div>
+
       <div class="pills-container" id="pillsContainer">
         <!-- Status code badges rendered dynamically -->
       </div>
@@ -674,6 +865,10 @@
             <button class="tab-btn" data-tab="nextjs" type="button">Next.js</button>
           </div>
 
+          <div class="response-header-bar">
+            <span class="resp-endpoint-display" id="respEndpointDisplay">GET /api/v1/errors/404</span>
+            <span class="resp-status-badge status-local" id="responseStatusBadge">Client Mode &bull; Local</span>
+          </div>
           <pre id="outputPre">Loading...</pre>
 
           <div class="code-actions">
@@ -688,10 +883,28 @@
           <div>
             <h2 style="font-size: 1.2rem; font-weight: 700;">Live Rendered Page Preview</h2>
             <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 2px;">
-              Accessible standalone HTML view rendered completely client-side in an isolated sandbox. Click <strong>"Try Again"</strong> inside the preview to reload quotes!
+              Live HTML view generated by server endpoint or client template fallback. Click <strong>"Try Again"</strong> inside the preview to trigger quote reloads!
             </p>
           </div>
           <button id="refreshPreviewBtn" class="btn" type="button">Reload Preview</button>
+        </div>
+
+        <div class="brand-config-bar">
+          <div class="config-input-group">
+            <label for="brandNameInput">Brand Name:</label>
+            <input type="text" id="brandNameInput" class="brand-input" value="WittyStatus" placeholder="e.g. MyCompany" style="max-width:130px;" />
+          </div>
+          <div class="config-input-group">
+            <label for="brandColorPicker">Color:</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="brandColorPicker" class="color-picker" value="#38bdf8" />
+              <input type="text" id="brandColorText" class="brand-input" value="#38bdf8" style="width:85px;" />
+            </div>
+          </div>
+          <div class="config-input-group" style="flex:1;">
+            <label for="brandSupportInput">Support URL:</label>
+            <input type="text" id="brandSupportInput" class="brand-input" placeholder="https://support.example.com" style="width:100%; min-width:140px;" />
+          </div>
         </div>
 
         <div class="preview-frame-container">
@@ -904,6 +1117,15 @@
       let currentQuoteIndex = 0;
       let currentTab = 'json';
 
+      // API State
+      let apiBaseUrl = (window.location.protocol.startsWith('http') && window.location.port === '3001')
+        ? window.location.origin
+        : 'http://localhost:3001';
+      let isLiveApiConnected = false;
+      let useLiveApi = true;
+      let lastApiPayload = null;
+
+      // DOM Elements
       const pillsContainer = document.getElementById('pillsContainer');
       const codeSelect = document.getElementById('codeSelect');
       const shuffleBtn = document.getElementById('shuffleBtn');
@@ -916,11 +1138,35 @@
       const themeIcon = document.getElementById('themeIcon');
       const themeLabel = document.getElementById('themeLabel');
 
+      // API Bar DOM
+      const apiStatusDot = document.getElementById('apiStatusDot');
+      const apiStatusLabel = document.getElementById('apiStatusLabel');
+      const apiLatencyTag = document.getElementById('apiLatencyTag');
+      const apiUrlInput = document.getElementById('apiUrlInput');
+      const apiConnectBtn = document.getElementById('apiConnectBtn');
+      const apiModeToggle = document.getElementById('apiModeToggle');
+      const apiModeText = document.getElementById('apiModeText');
+
+      // Response Header Bar DOM
+      const respEndpointDisplay = document.getElementById('respEndpointDisplay');
+      const responseStatusBadge = document.getElementById('responseStatusBadge');
+
+      // Brand Customizer DOM
+      const brandNameInput = document.getElementById('brandNameInput');
+      const brandColorPicker = document.getElementById('brandColorPicker');
+      const brandColorText = document.getElementById('brandColorText');
+      const brandSupportInput = document.getElementById('brandSupportInput');
+
       // Navigation views
       const navPlaygroundBtn = document.getElementById('navPlaygroundBtn');
       const navDocsBtn = document.getElementById('navDocsBtn');
       const playgroundView = document.getElementById('playgroundView');
       const docsView = document.getElementById('docsView');
+
+      function escapeXml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c));
+      }
 
       function switchView(viewName) {
         if (viewName === 'docs') {
@@ -972,6 +1218,22 @@
         updateTheme(isLight ? 'dark' : 'light');
       });
 
+      // Color picker sync
+      if (brandColorPicker && brandColorText) {
+        brandColorPicker.addEventListener('input', (e) => {
+          brandColorText.value = e.target.value;
+          renderIframe();
+        });
+        brandColorText.addEventListener('input', (e) => {
+          if (/^#[0-9a-fA-F]{6}$/.test(e.target.value)) {
+            brandColorPicker.value = e.target.value;
+          }
+          renderIframe();
+        });
+      }
+      if (brandNameInput) brandNameInput.addEventListener('input', renderIframe);
+      if (brandSupportInput) brandSupportInput.addEventListener('input', renderIframe);
+
       // Populate Pills & Select
       CODES.forEach(code => {
         const pill = document.createElement('button');
@@ -1018,7 +1280,7 @@
           pill.classList.toggle('active', pillCode === code);
         });
 
-        renderAll();
+        loadPayload();
       }
 
       function getQuotesForCurrentCode() {
@@ -1033,9 +1295,16 @@
         return list[currentQuoteIndex % list.length];
       }
 
-      function getPayload() {
+      function getLocalPayload() {
         if (currentCode === 'maintenance') {
-          const m = window.STATUS_DATA.maintenance;
+          const m = (window.STATUS_DATA && window.STATUS_DATA.maintenance) || {
+            wittyHeadline: 'Tuning the engine and polishing the chrome',
+            message: 'Our platform is undergoing scheduled maintenance.',
+            progressPercent: 78,
+            currentActivity: 'Running database migrations and warmups',
+            estimatedDuration: '15 to 30 minutes',
+            supportEmail: 'status@example.com'
+          };
           return {
             success: false,
             status: 503,
@@ -1068,54 +1337,103 @@
         };
       }
 
-      function renderAll() {
+      function renderSpotlight(payload) {
         const quotes = getQuotesForCurrentCode();
-        const quote = getCurrentQuote();
 
         if (currentCode === 'maintenance') {
-          const m = window.STATUS_DATA.maintenance;
           counterText.textContent = 'Dedicated Maintenance Status';
           document.getElementById('spotlightBadge').textContent = 'HTTP 503 \u2022 Scheduled Maintenance';
-          document.getElementById('spotlightHeadline').textContent = m.wittyHeadline;
-          document.getElementById('spotlightQuote').textContent = `"${m.message}"`;
-          document.getElementById('spotlightTech').textContent = m.currentActivity;
+          document.getElementById('spotlightHeadline').textContent = payload.headline || 'System Maintenance in Progress';
+          document.getElementById('spotlightQuote').textContent = `"${payload.message || 'Undergoing maintenance.'}"`;
+          document.getElementById('spotlightTech').textContent = payload.currentActivity || 'System upgrade';
           document.getElementById('spotlightAdvice').textContent = 'Check back shortly or monitor service status.';
           document.getElementById('spotlightAction').textContent = 'wait';
-        } else if (quote) {
-          counterText.textContent = `Quote ${currentQuoteIndex + 1} of ${quotes.length}`;
-          document.getElementById('spotlightBadge').textContent = `HTTP ${quote.code} \u2022 ${quote.title}`;
-          document.getElementById('spotlightHeadline').textContent = quote.headline;
-          document.getElementById('spotlightQuote').textContent = `"${quote.wittyMessage}"`;
-          document.getElementById('spotlightTech').textContent = quote.technicalDetails;
-          document.getElementById('spotlightAdvice').textContent = quote.actionAdvice;
-          document.getElementById('spotlightAction').textContent = quote.suggestedAction;
+        } else {
+          counterText.textContent = quotes.length > 0 ? `Quote ${currentQuoteIndex + 1} of ${quotes.length}` : 'Live API Response';
+          document.getElementById('spotlightBadge').textContent = `HTTP ${payload.status || currentCode} \u2022 ${payload.title || 'Error'}`;
+          document.getElementById('spotlightHeadline').textContent = payload.headline || 'Condition encountered';
+          document.getElementById('spotlightQuote').textContent = `"${payload.wittyMessage || payload.detail || ''}"`;
+          document.getElementById('spotlightTech').textContent = payload.technicalDetails || 'HTTP error condition.';
+          document.getElementById('spotlightAdvice').textContent = payload.actionAdvice || 'Verify parameters or retry.';
+          document.getElementById('spotlightAction').textContent = payload.suggestedAction || 'retry';
         }
-
-        renderOutput();
-        renderIframe();
       }
 
-      function renderOutput() {
-        const payload = getPayload();
+      async function loadPayload() {
+        const codeNum = currentCode === 'maintenance' ? 503 : currentCode;
+        const endpoint = currentCode === 'maintenance'
+          ? '/api/v1/maintenance'
+          : (currentTab === 'rfc7807'
+              ? `/api/v1/errors/${codeNum}?format=rfc7807`
+              : `/api/v1/errors/${codeNum}`);
+
+        respEndpointDisplay.textContent = `GET ${endpoint}`;
+
+        if (useLiveApi && isLiveApiConnected) {
+          const startTime = performance.now();
+          try {
+            const res = await fetch(`${apiBaseUrl}${endpoint}`, {
+              headers: {
+                'Accept': currentTab === 'rfc7807' ? 'application/problem+json' : 'application/json',
+                'X-Request-Id': `demo_${Date.now().toString(36)}`
+              }
+            });
+            const latency = Math.round(performance.now() - startTime);
+            const data = await res.json();
+            lastApiPayload = data;
+
+            responseStatusBadge.textContent = `HTTP ${res.status} \u2022 ${latency}ms`;
+            responseStatusBadge.className = `resp-status-badge ${res.status >= 500 ? 'status-5xx' : (res.status >= 400 ? 'status-4xx' : 'status-2xx')}`;
+
+            renderSpotlight(data);
+            renderOutput(data);
+            renderIframe();
+            return data;
+          } catch (err) {
+            console.warn('Live API request failed, falling back to local data:', err);
+            isLiveApiConnected = false;
+            apiStatusDot.className = 'status-dot offline';
+            apiStatusLabel.textContent = `Client Fallback Mode (API offline • run 'npm run dev')`;
+            apiLatencyTag.textContent = 'Catalog';
+          }
+        }
+
+        // Offline / client catalog mode
+        responseStatusBadge.textContent = 'Client Mode \u2022 Local';
+        responseStatusBadge.className = 'resp-status-badge status-local';
+        const fallback = getLocalPayload();
+        lastApiPayload = fallback;
+        renderSpotlight(fallback);
+        renderOutput(fallback);
+        renderIframe();
+        return fallback;
+      }
+
+      function renderOutput(payload) {
+        payload = payload || lastApiPayload || getLocalPayload();
         const codeNum = currentCode === 'maintenance' ? 503 : currentCode;
 
         if (currentTab === 'json') {
           outputPre.textContent = JSON.stringify(payload, null, 2);
         } else if (currentTab === 'rfc7807') {
-          const rfc = {
-            type: `https://httpstatuses.io/${codeNum}`,
-            title: payload.title || 'Error',
-            status: codeNum,
-            detail: payload.wittyMessage || payload.message,
-            instance: `/api/v1/resource`,
-            headline: payload.headline,
-            actionAdvice: payload.actionAdvice,
-            suggestedAction: payload.suggestedAction,
-            technicalDetails: payload.technicalDetails,
-            requestId: payload.requestId || 'trace_custom_999',
-            timestamp: payload.timestamp
-          };
-          outputPre.textContent = JSON.stringify(rfc, null, 2);
+          if (payload.type && payload.detail) {
+            outputPre.textContent = JSON.stringify(payload, null, 2);
+          } else {
+            const rfc = {
+              type: `https://httpstatuses.io/${codeNum}`,
+              title: payload.title || 'Error',
+              status: codeNum,
+              detail: payload.wittyMessage || payload.message,
+              instance: `/api/v1/resource`,
+              headline: payload.headline,
+              actionAdvice: payload.actionAdvice,
+              suggestedAction: payload.suggestedAction,
+              technicalDetails: payload.technicalDetails,
+              requestId: payload.requestId || 'trace_custom_999',
+              timestamp: payload.timestamp
+            };
+            outputPre.textContent = JSON.stringify(rfc, null, 2);
+          }
         } else if (currentTab === 'express') {
           outputPre.textContent =
             `// Express.js 1-Line Drop-in Integration\n` +
@@ -1152,7 +1470,7 @@
         } else if (currentTab === 'fetch') {
           outputPre.textContent =
             `// Fetch error handling with WittyStatus API\n` +
-            `const response = await fetch("http://localhost:3001/api/v1/errors/${codeNum}?format=rfc7807", {\n` +
+            `const response = await fetch("${apiBaseUrl}/api/v1/errors/${codeNum}?format=rfc7807", {\n` +
             `  headers: { "X-Request-Id": "trace-uuid-12345" }\n` +
             `});\n` +
             `const problemDetails = await response.json();\n\n` +
@@ -1160,13 +1478,13 @@
             `console.log(problemDetails.detail);\n` +
             `console.log("Action advice:", problemDetails.actionAdvice);`;
         } else if (currentTab === 'curl') {
-          outputPre.textContent = `curl -s -H "X-Request-Id: trace-custom-999" "http://localhost:3001/api/v1/errors/${codeNum}?format=rfc7807"`;
+          outputPre.textContent = `curl -s -H "X-Request-Id: trace-custom-999" "${apiBaseUrl}/api/v1/errors/${codeNum}?format=rfc7807"`;
         } else if (currentTab === 'nextjs') {
           outputPre.textContent =
             `// Next.js App Router (app/not-found.tsx)\n` +
             `import Link from 'next/link';\n\n` +
             `export default async function NotFound() {\n` +
-            `  const res = await fetch('http://localhost:3001/api/v1/errors/404', { cache: 'no-store' });\n` +
+            `  const res = await fetch('${apiBaseUrl}/api/v1/errors/404', { cache: 'no-store' });\n` +
             `  const error = await res.json();\n\n` +
             `  return (\n` +
             `    <main style={{ padding: '40px 20px', textAlign: 'center' }}>\n` +
@@ -1181,19 +1499,41 @@
       }
 
       function renderIframe() {
-        const payload = getPayload();
+        const brandName = brandNameInput ? brandNameInput.value.trim() || 'WittyStatus' : 'WittyStatus';
+        const brandColor = brandColorPicker ? brandColorPicker.value : '#38bdf8';
+        const brandSupport = brandSupportInput ? brandSupportInput.value.trim() : '';
+
+        if (useLiveApi && isLiveApiConnected) {
+          const renderPath = currentCode === 'maintenance'
+            ? `${apiBaseUrl}/render/maintenance?brand=${encodeURIComponent(brandName)}&color=${encodeURIComponent(brandColor)}${brandSupport ? `&support=${encodeURIComponent(brandSupport)}` : ''}`
+            : `${apiBaseUrl}/render/error/${currentCode}?brand=${encodeURIComponent(brandName)}&color=${encodeURIComponent(brandColor)}${brandSupport ? `&support=${encodeURIComponent(brandSupport)}` : ''}`;
+
+          if (previewFrame.src !== renderPath) {
+            previewFrame.src = renderPath;
+          }
+          return;
+        }
+
+        // Client template fallback for iframe
+        const payload = lastApiPayload || getLocalPayload();
         const theme = document.documentElement.getAttribute('data-theme') || 'dark';
 
         let html = '';
         if (currentCode === 'maintenance') {
-          const m = window.STATUS_DATA.maintenance;
+          const m = (window.STATUS_DATA && window.STATUS_DATA.maintenance) || {
+            wittyHeadline: 'Tuning the engine and polishing the chrome',
+            message: 'Our platform is undergoing scheduled maintenance.',
+            progressPercent: 78,
+            currentActivity: 'Running database migrations',
+            estimatedDuration: '15-30 minutes'
+          };
           html = `<!DOCTYPE html>
 <html lang="en" data-theme="${theme}">
 <head>
   <meta charset="UTF-8">
   <style>
-    :root { --bg: #0f172a; --card-bg: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8; --primary: #38bdf8; }
-    [data-theme="light"] { --bg: #f8fafc; --card-bg: #ffffff; --border: #e2e8f0; --text: #0f172a; --muted: #475569; --primary: #0284c7; }
+    :root { --bg: #0f172a; --card-bg: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8; --primary: ${brandColor}; }
+    [data-theme="light"] { --bg: #f8fafc; --card-bg: #ffffff; --border: #e2e8f0; --text: #0f172a; --muted: #475569; --primary: ${brandColor}; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: sans-serif; background: var(--bg); color: var(--text); padding: 24px 16px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 28px; max-width: 540px; width: 100%; text-align: center; }
@@ -1206,10 +1546,11 @@
 </head>
 <body>
   <div class="card">
-    <h1>${m.wittyHeadline}</h1>
-    <p>${m.message}</p>
+    <div style="font-size:0.8rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:12px;">${escapeXml(brandName)} Maintenance</div>
+    <h1>${escapeXml(m.wittyHeadline)}</h1>
+    <p>${escapeXml(m.message)}</p>
     <div class="progress-bar"><div class="fill"></div></div>
-    <p style="font-size:0.85rem">Current Task: ${m.currentActivity} (${m.progressPercent}%)</p>
+    <p style="font-size:0.85rem">Current Task: ${escapeXml(m.currentActivity)} (${m.progressPercent}%)</p>
     <button class="btn" onclick="window.parent.checkStatus ? window.parent.checkStatus() : window.location.reload()">Check Status</button>
   </div>
 </body>
@@ -1220,8 +1561,8 @@
 <head>
   <meta charset="UTF-8">
   <style>
-    :root { --bg: #0f172a; --card-bg: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8; --primary: #38bdf8; --code: #0b1120; }
-    [data-theme="light"] { --bg: #f8fafc; --card-bg: #ffffff; --border: #e2e8f0; --text: #0f172a; --muted: #475569; --primary: #0284c7; --code: #f1f5f9; }
+    :root { --bg: #0f172a; --card-bg: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8; --primary: ${brandColor}; --code: #0b1120; }
+    [data-theme="light"] { --bg: #f8fafc; --card-bg: #ffffff; --border: #e2e8f0; --text: #0f172a; --muted: #475569; --primary: ${brandColor}; --code: #f1f5f9; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: sans-serif; background: var(--bg); color: var(--text); padding: 24px 16px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 28px; max-width: 540px; width: 100%; }
@@ -1235,12 +1576,13 @@
 </head>
 <body>
   <div class="card">
-    <div class="badge">HTTP ${payload.status} : ${payload.title}</div>
-    <h1>${payload.headline}</h1>
-    <div class="quote">"${payload.wittyMessage}"</div>
+    <div style="font-size:0.8rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:8px;">${escapeXml(brandName)}</div>
+    <div class="badge">HTTP ${payload.status} : ${escapeXml(payload.title || '')}</div>
+    <h1>${escapeXml(payload.headline || '')}</h1>
+    <div class="quote">"${escapeXml(payload.wittyMessage || '')}"</div>
     <div class="advice">
-      <p><strong>Occurred:</strong> ${payload.technicalDetails}</p>
-      <p style="margin-top:4px"><strong>Action:</strong> ${payload.actionAdvice}</p>
+      <p><strong>Occurred:</strong> ${escapeXml(payload.technicalDetails || '')}</p>
+      <p style="margin-top:4px"><strong>Action:</strong> ${escapeXml(payload.actionAdvice || '')}</p>
     </div>
     <div>
       <button class="btn" onclick="window.parent.shuffleQuote ? window.parent.shuffleQuote() : window.location.reload()">Try Again</button>
@@ -1267,14 +1609,14 @@
           } while (nextIndex === currentQuoteIndex);
           currentQuoteIndex = nextIndex;
         }
-        renderAll();
+        loadPayload();
       }
 
       function previousQuote() {
         const quotes = getQuotesForCurrentCode();
         if (quotes.length > 1) {
           currentQuoteIndex = (currentQuoteIndex - 1 + quotes.length) % quotes.length;
-          renderAll();
+          loadPayload();
         }
       }
 
@@ -1283,7 +1625,7 @@
           const m = window.STATUS_DATA.maintenance;
           m.progressPercent = Math.min(99, m.progressPercent + Math.floor(Math.random() * 4) + 1);
         }
-        renderAll();
+        loadPayload();
       }
 
       // Expose to window for iframe click triggers
@@ -1299,7 +1641,7 @@
           document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           currentTab = btn.getAttribute('data-tab');
-          renderOutput();
+          loadPayload();
         });
       });
 
@@ -1318,13 +1660,33 @@
 
       refreshPreviewBtn.addEventListener('click', renderIframe);
 
+      // API Connection Toolbar Event Handlers
+      apiConnectBtn.addEventListener('click', () => {
+        checkApiHealth(apiUrlInput.value);
+      });
+
+      apiModeToggle.addEventListener('click', () => {
+        useLiveApi = !useLiveApi;
+        apiModeText.textContent = useLiveApi ? 'Live API' : 'Static Catalog';
+        apiModeToggle.className = useLiveApi ? 'btn btn-sm btn-primary' : 'btn btn-sm';
+        loadPayload();
+      });
+
+      apiUrlInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          checkApiHealth(apiUrlInput.value);
+        }
+      });
+
       // Handle initial URL hash
       if (window.location.hash === '#docs') {
         switchView('docs');
       }
 
       // Initial execution
+      apiUrlInput.value = apiBaseUrl;
       setCode(404);
+      checkApiHealth(apiBaseUrl);
     })();
   </script>
 </body>
